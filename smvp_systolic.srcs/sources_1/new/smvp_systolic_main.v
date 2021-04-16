@@ -45,6 +45,8 @@ module smvp_systolic_top
     wire [NODE_COUNT:0] i_xfer;
     wire [NODE_COUNT:0] accum_xfer;
     wire [NODE_COUNT:0] vector_xfer;
+    wire val_out_tail; // output dummy for tail-end selective adder PE
+    wire i_out_tail; // output dummy for tail-end selective adder PE
     
     // Dynamic Module Instantiation
     generate
@@ -54,15 +56,25 @@ module smvp_systolic_top
             if( i == 0 ) begin
                 svmp_pe_mult mult( .clk(clk), .reset(btnC), .a_ij(0), .x_j(0), .val(val_xfer[i]) ); // TODO: needs BRAM source for a_ij/x_j (currently set to zero)
             end
-        
-            // Generate interconnected selective adder PEs
-            svmp_pe_seladd sel_add( .clk(clk), .reset(btnC),
-                                    .val_in(val_xfer[i]), .val_out(val_xfer[i+1]),
-                                    .i_in(i_xfer[i]), .i_out(i_xfer[i+1]),
-                                    .vector_in(vector_xfer[i]), .accum_out(accum_xfer[i]) );
-                                    
-            // Generate and connect accumulator PEs
-            smvp_pe_accum accum( .clk(clk), .reset(btnC), .val(accum_xfer[i]), .sum(0) ); // TODO: needs BRAM dest for sum (currently set to zero)
+            
+            if (i < NODE_COUNT) begin
+                // Generate selective adder PEs
+                svmp_pe_seladd sel_add( .clk(clk), .reset(btnC),
+                                        .val_in(val_xfer[i]), .val_out(val_xfer[i+1]),
+                                        .i_in(i_xfer[i]), .i_out(i_xfer[i+1]),
+                                        .vector_in(vector_xfer[i]), .accum_out(accum_xfer[i]) );
+            end
+            else begin
+                // Generate "tail-end" selective adder PE
+               svmp_pe_seladd sel_add( .clk(clk), .reset(btnC),
+                                       .val_in(val_xfer[i]), .val_out(val_out_tail),
+                                       .i_in(i_xfer[i]), .i_out(i_out_tail),
+                                       .vector_in(vector_xfer[i]), .accum_out(accum_xfer[i]) );                                    
+            end
+            
+            // Generate accumulator PEs
+            smvp_pe_accum accum( .clk(clk), .reset(btnC), .val(accum_xfer[i]), .sum(0) ); // TODO: needs BRAM dest for sum (currently set to zero) 
+
         end
     endgenerate 
     
@@ -78,8 +90,8 @@ module debounce #(parameter DELAY=1000000-1) (input reset, clk, btn_unstable, ou
     always @(posedge clk) begin
         if (reset) begin // return to known state
             count <= 0;
-            old <= btn_unstable;
-            btn_stable <= btn_unstable;
+            old <= 0;
+            btn_stable <= 0;
         end
         else if (btn_unstable != old) begin// input changed
             old <= btn_unstable;
@@ -88,18 +100,15 @@ module debounce #(parameter DELAY=1000000-1) (input reset, clk, btn_unstable, ou
         else if (count == DELAY) // stable!
             btn_stable <= old;
         else // waiting…
-            count <= count+1;
+            count <= count + 1;
     end
 endmodule
 
 // Module: SMVP Processing Element - Multiplier
 module svmp_pe_mult (input clk, reset, a_ij, x_j, output reg val);
     always @(posedge clk) begin
-        if (reset) begin
-            val <= 0;
-        end
-        else
-            val <= a_ij * x_j;
+        if (reset) val <= 0;
+        else val <= a_ij * x_j;
     end
 endmodule
 
@@ -109,16 +118,21 @@ module svmp_pe_seladd (input clk, reset, val_in, i_in, vector_in, output reg val
         if (reset) begin
                 val_out <= 0;
                 i_out <= 0;
+                accum_out <= 0;
         end
         else begin
-                i_out <= i_in - 1;
-                case (i_in)
-                    0: begin
-                        accum_out <= val_in + vector_in;
-                        i_out <= 0;
-                    end
-                    default: val_out <= 0;
-                endcase
+            case (i_in)
+                0: begin
+                    val_out <= 0;
+                    i_out <= 0;
+                    accum_out <= val_in + vector_in;
+                end
+                default: begin
+                    val_out <= val_in;
+                    i_out <= i_in - 1;
+                    accum_out <= 0;
+                end
+            endcase
         end
     end
 endmodule
@@ -126,11 +140,7 @@ endmodule
 // Module: SMVP Processing Element - Accumulator
 module svmp_pe_accum (input clk, reset, val, output reg sum);
     always @(posedge clk) begin
-        if (reset) begin
-            sum <= 0;
-        end
-        else begin
-            sum <= sum + val;
-        end
+        if (reset) sum <= 0;
+        else sum <= sum + val;
     end
 endmodule
