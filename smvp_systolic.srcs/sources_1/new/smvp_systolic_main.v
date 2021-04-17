@@ -23,7 +23,12 @@
 
 // Top Module: Sparse Matrix Vector Multiplication Accelerator
 module smvp_systolic_top
-    #(parameter NODE_COUNT=8)
+    // Parameter Notes:
+    // PE array of 16x4 was the recommended optimal topology as per research paper "SYSTOLIC SPARSE MATRIX VECTOR MULTIPLY IN THE AGE OF TPUS AND ACCELERATORS"
+    // Data bit length of 1 BECAUSE PATTERNS R EZ
+    #(parameter SYS_ARR_COLS=16,
+      parameter SYS_ARR_ROWS=4,
+      parameter DATA_BIT_LENGTH=1)
     (
     // Basys3 Clock Input (defined in constraints)
     input clk,
@@ -40,42 +45,90 @@ module smvp_systolic_top
     // Seven Segment Display Signal (INCOMPLETE)
     reg [15:0] segseven_disp; //input to seg7 to define segment pattern
     
-    // PE Interconnects
-    wire [NODE_COUNT:0] val_xfer;
-    wire [NODE_COUNT:0] i_xfer;
-    wire [NODE_COUNT:0] accum_xfer;
-    wire [NODE_COUNT:0] vector_xfer;
-    wire val_out_tail; // output dummy for tail-end selective adder PE
-    wire i_out_tail; // output dummy for tail-end selective adder PE
+    // Array Inputs
+    wire [DATA_BIT_LENGTH-1:0] x_j_input;  // TODO: needs BRAM source for x_j
+    wire [DATA_BIT_LENGTH-1:0] a_ij_input [SYS_ARR_ROWS:0];  // TODO: needs BRAM source for a_ij
+    wire [DATA_BIT_LENGTH-1:0] i_input [SYS_ARR_ROWS:0];  // TODO: needs BRAM source for i
     
+    // PE Interconnects (aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa)
+    wire [DATA_BIT_LENGTH-1:0] ax_xfer [SYS_ARR_COLS:0][SYS_ARR_ROWS:0]; // wires at column index 0 and column last index not used
+    wire [DATA_BIT_LENGTH-1:0] i_xfer [SYS_ARR_COLS:0][SYS_ARR_ROWS:0]; // wires at column index 0 and column last index not used
+    wire [DATA_BIT_LENGTH-1:0] accum_xfer [SYS_ARR_COLS:0][SYS_ARR_ROWS:0]; // wire at row index 0 not used
+    wire [DATA_BIT_LENGTH-1:0] mult_xj_sync [SYS_ARR_ROWS:0]; // wires at index 0 and last index not used
+    
+    // Array Outputs
+    reg [DATA_BIT_LENGTH-1:0] accum_result [SYS_ARR_COLS:0];  // TODO: might want to use BRAM instead of reg for result (for ease of reading?)
+
     // Dynamic Module Instantiation
     generate
-        genvar i; 
-        for (i = 0; i < NODE_COUNT; i = i + 1) begin
-            // Generate lead multiplier PE (single instance)
-            if( i == 0 ) begin
-                svmp_pe_mult mult( .clk(clk), .reset(btnC), .a_ij(0), .x_j(0), .val(val_xfer[i]) ); // TODO: needs BRAM source for a_ij/x_j (currently set to zero)
+        genvar row_num, col_num;
+        // Iterate through rows
+        for (row_num = 0; row_num < SYS_ARR_ROWS; row_num = row_num + 1) begin
+            // Iterate through columns
+            for (col_num = 0; col_num < SYS_ARR_COLS; col_num = col_num + 1) begin
+                
+                //
+                // Multiplier PE Generation Section
+                //
+                
+                if( col_num == 0 ) begin
+                    // Generate front-end multiplier PE (single instance per row, first column)
+                    if (row_num == 0) begin
+                        svmp_pe_mult mult( .clk(clk), .reset(btnC),
+                                           .a_ij(a_ij_input[row_num]), .x_j_in(x_j_input),
+                                           .product_out(ax_xfer[col_num][row_num]), .x_j_out(mult_xj_sync[row_num + 1]) );
+                    end
+                    else begin
+                        svmp_pe_mult mult( .clk(clk), .reset(btnC),
+                                           .a_ij(a_ij_input[row_num]), .x_j_in(mult_xj_sync[row_num]),
+                                           .product_out(ax_xfer[col_num][row_num]), .x_j_out(mult_xj_sync[row_num + 1]) );
+                    end
+                end
+                
+                //
+                // Selective Adder PE Generation Section
+                //
+                
+                if (col_num == 0 && row_num == 0) begin
+                    // Generate "northwest" selective adder PE (single instance, location [0][0])
+                    svmp_pe_seladd sel_add( .clk(clk), .reset(btnC),
+                                            .ax_in(ax_xfer[col_num][row_num]), .ax_out(ax_xfer[col_num + 1][row_num]),
+                                            .i_in(i_input[row_num]), .i_out(i_xfer[col_num + 1][row_num]),
+                                            .accum_in(0), .accum_out(accum_xfer[col_num][row_num + 1]) );                                    
+                end
+                else if (row_num == 0) begin
+                    // Generate "north-edge" selective adder PEs (first row)
+                    svmp_pe_seladd sel_add( .clk(clk), .reset(btnC),
+                                            .ax_in(ax_xfer[col_num][row_num]), .ax_out(ax_xfer[col_num + 1][row_num]),
+                                            .i_in(i_xfer[col_num][row_num]), .i_out(i_xfer[col_num + 1][row_num]),
+                                            .accum_in(0), .accum_out(accum_xfer[col_num][row_num + 1]) );                                    
+                end
+                else if (col_num == 0) begin
+                    // Generate "west-edge" selective adder PEs (first column)
+                    svmp_pe_seladd sel_add( .clk(clk), .reset(btnC),
+                                            .ax_in(ax_xfer[col_num][row_num]), .ax_out(ax_xfer[col_num + 1][row_num]),
+                                            .i_in(i_input[row_num]), .i_out(i_xfer[col_num + 1][row_num]),
+                                            .accum_in(accum_xfer[col_num][row_num]), .accum_out(accum_xfer[col_num][row_num + 1]) );                                    
+                end
+                else begin
+                    // Generate remaining selective adder PEs (all except north or west edges)
+                    svmp_pe_seladd sel_add( .clk(clk), .reset(btnC),
+                                            .ax_in(ax_xfer[col_num][row_num]), .ax_out(ax_xfer[col_num + 1][row_num]),
+                                            .i_in(i_xfer[col_num][row_num]), .i_out(i_xfer[col_num + 1][row_num]),
+                                            .accum_in(accum_xfer[col_num][row_num]), .accum_out(accum_xfer[col_num][row_num + 1]) );    
+                end
+              
+                //
+                // Column Accumulator PE Generation Section
+                //
+                
+                if (row_num == SYS_ARR_ROWS - 1) begin
+                    // Generate accumulator PEs (last row only)
+                    smvp_pe_accum accum( .clk(clk), .reset(btnC), .accum_in(accum_xfer[col_num][row_num]), .sum(accum_result[col_num]) );
+                end 
+    
             end
-            
-            if (i < NODE_COUNT) begin
-                // Generate selective adder PEs
-                svmp_pe_seladd sel_add( .clk(clk), .reset(btnC),
-                                        .val_in(val_xfer[i]), .val_out(val_xfer[i+1]),
-                                        .i_in(i_xfer[i]), .i_out(i_xfer[i+1]),
-                                        .vector_in(vector_xfer[i]), .accum_out(accum_xfer[i]) );
-            end
-            else begin
-                // Generate "tail-end" selective adder PE
-               svmp_pe_seladd sel_add( .clk(clk), .reset(btnC),
-                                       .val_in(val_xfer[i]), .val_out(val_out_tail),
-                                       .i_in(i_xfer[i]), .i_out(i_out_tail),
-                                       .vector_in(vector_xfer[i]), .accum_out(accum_xfer[i]) );                                    
-            end
-            
-            // Generate accumulator PEs
-            smvp_pe_accum accum( .clk(clk), .reset(btnC), .val(accum_xfer[i]), .sum(0) ); // TODO: needs BRAM dest for sum (currently set to zero) 
-
-        end
+        end        
     endgenerate 
     
 endmodule
@@ -105,30 +158,38 @@ module debounce #(parameter DELAY=1000000-1) (input reset, clk, btn_unstable, ou
 endmodule
 
 // Module: SMVP Processing Element - Multiplier
-module svmp_pe_mult (input clk, reset, a_ij, x_j, output reg val);
+module svmp_pe_mult (input clk, reset, a_ij, x_j_in, output reg product_out, x_j_out);
     always @(posedge clk) begin
-        if (reset) val <= 0;
-        else val <= a_ij * x_j;
+        if (reset) begin
+            product_out <= 0;
+            x_j_out <= 0;
+        end
+        else product_out <= a_ij * x_j_in;      
     end
+    
+    always @(*) begin
+        x_j_out = x_j_in; // blocking assignment because all multiplier PEs should receive the same value simultaneously
+    end
+
 endmodule
 
 // Module: SMVP Processing Element - Selective Adder
-module svmp_pe_seladd (input clk, reset, val_in, i_in, vector_in, output reg val_out, i_out, accum_out);
+module svmp_pe_seladd (input clk, reset, ax_in, i_in, accum_in, output reg ax_out, i_out, accum_out);
     always @(posedge clk) begin
         if (reset) begin
-                val_out <= 0;
+                ax_out <= 0;
                 i_out <= 0;
                 accum_out <= 0;
         end
         else begin
             case (i_in)
                 0: begin
-                    val_out <= 0;
+                    ax_out <= 0;
                     i_out <= 0;
-                    accum_out <= val_in + vector_in;
+                    accum_out <= ax_in + accum_in;
                 end
                 default: begin
-                    val_out <= val_in;
+                    ax_out <= ax_in;
                     i_out <= i_in - 1;
                     accum_out <= 0;
                 end
@@ -138,9 +199,9 @@ module svmp_pe_seladd (input clk, reset, val_in, i_in, vector_in, output reg val
 endmodule
 
 // Module: SMVP Processing Element - Accumulator
-module svmp_pe_accum (input clk, reset, val, output reg sum);
+module svmp_pe_accum (input clk, reset, accum_in, output reg sum);
     always @(posedge clk) begin
         if (reset) sum <= 0;
-        else sum <= sum + val;
+        else sum <= sum + accum_in;
     end
 endmodule
