@@ -28,7 +28,8 @@ module smvp_systolic_top
     // Data bit length of 1 BECAUSE PATTERNS
     #(parameter SYS_ARR_COLS=16,
       parameter SYS_ARR_ROWS=4,
-      parameter DATA_BIT_LENGTH=1)
+      parameter DATA_BIT_LENGTH=1,
+      parameter DEPTH=8)
     (
     // Basys3 Clock Input (defined in constraints)
     input clk,
@@ -38,11 +39,11 @@ module smvp_systolic_top
     
     // Basys3 7-Segment LED Outputs (defined in constraints)
     output [6:0] seg,
-    output [3:0] an, 
+    output [3:0] an,
     output dp,
     
-    // LED Array (1x16)
-    output [15:0] led   
+    // Basys3 LEDs
+    output [15:0] led
     );
     
     // Seven Segment Display Signal (INCOMPLETE)
@@ -50,8 +51,17 @@ module smvp_systolic_top
     
     // Array Inputs
     wire [DATA_BIT_LENGTH-1:0] x_j_input;  // TODO: needs BRAM source for x_j
-    wire [DATA_BIT_LENGTH-1:0] a_ij_input [SYS_ARR_ROWS:0];  // TODO: needs BRAM source for a_ij
-    wire [DATA_BIT_LENGTH-1:0] i_input [SYS_ARR_ROWS:0];  // TODO: needs BRAM source for i
+    wire [DATA_BIT_LENGTH-1:0] a_ij_input [SYS_ARR_ROWS-1:0];  // TODO: needs BRAM source for a_ij
+    wire [DATA_BIT_LENGTH-1:0] i_input [SYS_ARR_ROWS-1:0];  // TODO: needs BRAM source for i
+    
+    
+    // Array storage
+    reg [DATA_BIT_LENGTH-1:0] x_j [DEPTH:0];
+    reg [DATA_BIT_LENGTH-1:0] a_ij [SYS_ARR_ROWS-1:0][DEPTH:0];
+    reg [DATA_BIT_LENGTH-1:0] i [SYS_ARR_ROWS-1:0][DEPTH:0];
+    
+    
+    reg [2:0] counter;
     
     // PE Interconnects
     wire [DATA_BIT_LENGTH-1:0] ax_xfer [SYS_ARR_COLS:0][SYS_ARR_ROWS:0]; // wires at column index 0 and column last index not used
@@ -60,11 +70,13 @@ module smvp_systolic_top
     wire [DATA_BIT_LENGTH-1:0] mult_xj_sync [SYS_ARR_ROWS:0]; // wires at index 0 and last index not used
     
     // Array Outputs
-    wire [DATA_BIT_LENGTH-1:0] accum_result [SYS_ARR_COLS:0];  // TODO: use BRAM or reg for result
+    wire [SYS_ARR_COLS-1:0] accum_result;  // TODO: use BRAM or reg for result
 
     // BRAM I/O
     reg [7:0] bram_data_out;
     reg [10:0] bram_addr;
+    
+    integer iter;
 
     // BRAM Instantiation
     // Commented out while COE file not ready for import
@@ -144,24 +156,62 @@ module smvp_systolic_top
     
             end
         end        
-    endgenerate 
+    endgenerate
     
-    assign led[0] = |(accum_result[0]);
-    assign led[1] = |(accum_result[1]);
-    assign led[2] = |(accum_result[2]);
-    assign led[3] = |(accum_result[3]);
-    assign led[4] = |(accum_result[4]);
-    assign led[5] = |(accum_result[5]);
-    assign led[6] = |(accum_result[6]);
-    assign led[7] = |(accum_result[7]);
-    assign led[8] = |(accum_result[8]);
-    assign led[9] = |(accum_result[9]);
-    assign led[10] = |(accum_result[10]);
-    assign led[11] = |(accum_result[11]);
-    assign led[12] = |(accum_result[12]);
-    assign led[13] = |(accum_result[13]);
-    assign led[14] = |(accum_result[14]);
-    assign led[15] = |(accum_result[15]);
+
+    assign led[15:0] = accum_result[15:0];
+//    assign led[14] = accum_result[14];
+//    assign led[13] = accum_result[13];
+//    assign led[12] = accum_result[12];
+//    assign led[11] = accum_result[11];
+//    assign led[10] = accum_result[10];
+//    assign led[9] = accum_result[9];
+//    assign led[8] = accum_result[8];
+//    assign led[7] = accum_result[7];
+//    assign led[6] = accum_result[6];
+//    assign led[5] = accum_result[5];
+//    assign led[4] = accum_result[4];
+//    assign led[3] = accum_result[3];
+//    assign led[2] = accum_result[2];
+//    assign led[1] = accum_result[1];
+//    assign led[0] = accum_result[0];
+
+    initial begin
+        counter = 0;
+        for (iter=0; iter<=DEPTH; iter=iter+1) begin
+            if(iter % 3) begin
+                a_ij[0][iter] = 1'b1;
+                a_ij[1][iter] = 1'b1;
+                a_ij[2][iter] = 1'b1;
+                a_ij[3][iter] = 1'b1;
+                i[0][iter] = 1'b1;
+                i[1][iter] = 1'b1;
+                i[2][iter] = 1'b1;
+                i[3][iter] = 1'b1;
+                x_j[iter] = 1'b1;
+            end
+        end        
+    end
+    
+        
+        
+    always @(posedge clk) begin
+        counter <= counter + 1;
+    end
+    
+    assign x_j_input = x_j[counter];
+    assign a_ij_input[0] = a_ij_input[0][counter];
+    assign a_ij_input[1] = a_ij_input[1][counter];
+    assign a_ij_input[2] = a_ij_input[2][counter];
+    assign a_ij_input[3] = a_ij_input[3][counter];
+    assign a_ij_input[1][0] = counter % 2 ? 1'b1 : 1'b0;
+    assign a_ij_input[2][0] = counter % 2 ? 1'b1 : 1'b0;
+    assign a_ij_input[3][0] = counter % 2 ? 1'b1 : 1'b0;
+//    assign i_input[3:0] = i_reg[3:0][counter];
+    assign i_input[0] = i[0][counter];
+    assign i_input[1] = i[1][counter];
+    assign i_input[2] = i[2][counter];
+    assign i_input[3] = i[3][counter];
     
 endmodule
 
