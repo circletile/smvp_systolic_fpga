@@ -39,7 +39,10 @@ module smvp_systolic_top
     // Basys3 7-Segment LED Outputs (defined in constraints)
     output [6:0] seg,
     output [3:0] an, 
-    output dp
+    output dp,
+    
+    // LED Array (1x16)
+    output [15:0] led   
     );
     
     // Seven Segment Display Signal (INCOMPLETE)
@@ -136,12 +139,29 @@ module smvp_systolic_top
                 
                 if (row_num == SYS_ARR_ROWS - 1) begin
                     // Generate accumulator PEs (last/south row only)
-                    smvp_pe_accum accum( .clk(clk), .reset(btnC), .accum_in(accum_xfer[col_num][row_num]), .sum(accum_result[col_num]) );
+                    smvp_pe_accum accum( .clk(clk), .reset(btnC), .accum_in(accum_xfer[col_num][row_num + 1]), .sum(accum_result[col_num]) );
                 end 
     
             end
         end        
     endgenerate 
+    
+    assign led[0] = |(accum_result[0]);
+    assign led[1] = |(accum_result[1]);
+    assign led[2] = |(accum_result[2]);
+    assign led[3] = |(accum_result[3]);
+    assign led[4] = |(accum_result[4]);
+    assign led[5] = |(accum_result[5]);
+    assign led[6] = |(accum_result[6]);
+    assign led[7] = |(accum_result[7]);
+    assign led[8] = |(accum_result[8]);
+    assign led[9] = |(accum_result[9]);
+    assign led[10] = |(accum_result[10]);
+    assign led[11] = |(accum_result[11]);
+    assign led[12] = |(accum_result[12]);
+    assign led[13] = |(accum_result[13]);
+    assign led[14] = |(accum_result[14]);
+    assign led[15] = |(accum_result[15]);
     
 endmodule
 
