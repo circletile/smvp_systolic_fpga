@@ -26,7 +26,7 @@ module smvp_systolic_top
     // Parameter Notes:
     // PE array of 16x4 was the optimal topology indicated in research paper "SYSTOLIC SPARSE MATRIX VECTOR MULTIPLY IN THE AGE OF TPUS AND ACCELERATORS"
     // Data bit length of 1 BECAUSE PATTERNS
-    #(parameter SYS_ARR_COLS=33,
+    #(parameter SYS_ARR_COLS=32,
       parameter SYS_ARR_ROWS=7,
       parameter DATA_BIT_LENGTH=1,
       parameter OUTPUT_BIT_LENGTH=8,
@@ -37,29 +37,21 @@ module smvp_systolic_top
     
     // Basys3 Button Inputs (defined in constraints)
     input btnC,
-    
-    // Basys3 7-Segment LED Outputs (defined in constraints)
-    output [6:0] seg,
-    output [3:0] an,
-    output dp,
-    
+
     // Basys3 LEDs
     output [15:0] led
     );
-    
-    // Seven Segment Display Signal (INCOMPLETE)
-    reg [15:0] segseven_disp; //input to seg7 to define segment pattern
-    
+        
     // Array Inputs
     wire [DATA_BIT_LENGTH-1:0] x_j_input;  // TODO: needs BRAM source for x_j
-    wire [OUTPUT_BIT_LENGTH-1:0] a_ij_input [SYS_ARR_ROWS-1:0];  // TODO: needs BRAM source for a_ij
+    wire [DATA_BIT_LENGTH-1:0] a_ij_input [SYS_ARR_ROWS-1:0];  // TODO: needs BRAM source for a_ij
     wire [OUTPUT_BIT_LENGTH-1:0] i_input [SYS_ARR_ROWS-1:0];  // TODO: needs BRAM source for i
     
     
     // Array storage
     reg [DATA_BIT_LENGTH-1:0] x_j [QUEUE_SIZE:0];
-    reg [OUTPUT_BIT_LENGTH-1:0] a_ij [SYS_ARR_ROWS-1:0][QUEUE_SIZE:0];
-    reg [OUTPUT_BIT_LENGTH-1:0] i [SYS_ARR_ROWS-1:0][QUEUE_SIZE:0];
+    reg [DATA_BIT_LENGTH-1:0] a_ij [SYS_ARR_ROWS-1:0][QUEUE_SIZE-1:0];
+    reg [OUTPUT_BIT_LENGTH-1:0] i [SYS_ARR_ROWS-1:0][QUEUE_SIZE-1:0];
     
     
     reg [15:0] counter;
@@ -76,7 +68,6 @@ module smvp_systolic_top
     wire [OUTPUT_BIT_LENGTH-1:0] accum_result [SYS_ARR_COLS-1:0];  // TODO: use BRAM or reg for result
 
     integer iter;
-    integer j;
 
     // BRAM Instantiation
     // Commented out while COE file not ready for import
@@ -99,9 +90,7 @@ module smvp_systolic_top
                 //
                 
                 if( col_num == 0 ) begin
-                
-                    assign a_ij_input[row_num] = a_ij_input[row_num][counter];
-                    assign i_input[row_num] = i[row_num][counter];
+
                     
                     // Generate front-end multiplier PE (single instance per row, first column)
                     if (row_num == 0) begin
@@ -125,14 +114,14 @@ module smvp_systolic_top
                     smvp_pe_seladd sel_add( .clk(clk), .reset(btnC),
                                             .ax_in(ax_xfer[col_num][row_num]), .ax_out(ax_xfer[col_num + 1][row_num]),
                                             .i_in(i_input[row_num]), .i_out(i_xfer[col_num + 1][row_num]),
-                                            .accum_in(0), .accum_out(accum_xfer[col_num][row_num + 1]) );                                    
+                                            .accum_in(8'b0), .accum_out(accum_xfer[col_num][row_num + 1]) );                                    
                 end
                 else if (row_num == 0) begin
                     // Generate "north-edge" selective adder PEs (first row)
                     smvp_pe_seladd sel_add( .clk(clk), .reset(btnC),
                                             .ax_in(ax_xfer[col_num][row_num]), .ax_out(ax_xfer[col_num + 1][row_num]),
                                             .i_in(i_xfer[col_num][row_num]), .i_out(i_xfer[col_num + 1][row_num]),
-                                            .accum_in(0), .accum_out(accum_xfer[col_num][row_num + 1]) );                                    
+                                            .accum_in(8'b0), .accum_out(accum_xfer[col_num][row_num + 1]) );                                    
                 end
                 else if (col_num == 0) begin
                     // Generate "west-edge" selective adder PEs (first column)
@@ -173,10 +162,12 @@ module smvp_systolic_top
 //        end
 //    endgenerate    
 
-    assign led[15:0] = accum_result[big_counter[32:28]];
+    assign led[7:0] = accum_result[big_counter[32:28]];
+    assign led[13:8] = big_counter[32:28];
 
     initial begin
         counter = 0;
+        big_counter = 0;
         a_ij[0][0] = 1'b1;
         a_ij[0][1] = 1'b1;
         a_ij[0][2] = 1'b1;
@@ -640,51 +631,29 @@ module smvp_systolic_top
         i[6][31] = 1'b0;
         i[6][32] = 1'b0;     
     end
-    
-        
-        
+
     always @(posedge clk) begin
         counter <= counter + 1;
         big_counter <= big_counter + 1;
     end
-    
-    
-    
-//    always @(posedge clk) begin
-////        for(j = 0; j < 33; j=j+1) begin
-////            total <= total + accum_result[j];
-////        end
-//        total <= total + accum_result[0];
-//        total <= total + accum_result[1];
-//    end
-    
+
     assign x_j_input = 1'b1;
+    
+    generate
+        // Iterate through rows
+        for (row_num = 0; row_num < SYS_ARR_ROWS; row_num = row_num + 1) begin
+            // Iterate through columns
+            for (col_num = 0; col_num < SYS_ARR_COLS; col_num = col_num + 1) begin
+                    
+                assign a_ij_input[row_num] = a_ij[row_num][counter];
+                assign i_input[row_num] = i[row_num][counter];
+                    
+            end
+        end
+    endgenerate
     
 endmodule
 
-// Module: Switch Debounce
-// Use your system clock for the clock input to produce a synchronous, debounced output
-// DELAY = .01 sec with a 100Mhz clock
-// ref: http://web.mit.edu/6.111/www/f2016/handouts/L04.pdf
-module debounce #(parameter DELAY=1000000-1) (input reset, clk, btn_unstable, output reg btn_stable);
-    reg [18:0] count;
-    reg old;
-    always @(posedge clk) begin
-        if (reset) begin // return to known state
-            count <= 0;
-            old <= 0;
-            btn_stable <= 0;
-        end
-        else if (btn_unstable != old) begin// input changed
-            old <= btn_unstable;
-            count <= 0;
-        end
-        else if (count == DELAY) // stable!
-            btn_stable <= old;
-        else // waiting…
-            count <= count + 1;
-    end
-endmodule
 
 // Module: SMVP Processing Element - Multiplier
 module smvp_pe_mult     
@@ -694,19 +663,20 @@ module smvp_pe_mult
       parameter OUTPUT_BIT_LENGTH=8,
       parameter QUEUE_SIZE=33
     )
-    (input clk, reset, a_ij, x_j_in, output reg product_out, x_j_out);
+    (input clk, reset,input [DATA_BIT_LENGTH-1:0] a_ij, input [DATA_BIT_LENGTH-1:0] x_j_in, output reg [DATA_BIT_LENGTH-1:0] product_out, output reg [DATA_BIT_LENGTH-1:0] x_j_out);
     always @(posedge clk) begin
-        if (reset) begin
-            product_out <= 0;
-            x_j_out <= 0;
-        end
-        else product_out <= a_ij * x_j_in;
-//        product_out <= a_ij * x_j_in;
+//        if (reset) begin
+//            product_out <= 0;
+//            x_j_out <= 0;
+//        end
+//        else product_out <= a_ij * x_j_in;
+        product_out = a_ij & x_j_in;
+        x_j_out = x_j_in;
     end
     
-    always @(*) begin
-        x_j_out = x_j_in; // blocking assignment because all multiplier PEs should receive the same value simultaneously
-    end
+//    always @(posedge clk) begin
+//        x_j_out = x_j_in; // blocking assignment because all multiplier PEs should receive the same value simultaneously
+//    end
 
 endmodule
 
@@ -718,7 +688,7 @@ module smvp_pe_seladd
       parameter OUTPUT_BIT_LENGTH=8,
       parameter QUEUE_SIZE=33
     )
-    (input clk, reset, input [DATA_BIT_LENGTH-1:0] ax_in, input [OUTPUT_BIT_LENGTH-1:0] i_in, input [OUTPUT_BIT_LENGTH-1:0] accum_in, output reg ax_out, output reg [OUTPUT_BIT_LENGTH-1:0] i_out, accum_out);
+    (input clk, reset, input [DATA_BIT_LENGTH-1:0] ax_in, input [OUTPUT_BIT_LENGTH-1:0] i_in, input [OUTPUT_BIT_LENGTH-1:0] accum_in, output reg ax_out, output reg [OUTPUT_BIT_LENGTH-1:0] i_out, output reg [OUTPUT_BIT_LENGTH-1:0] accum_out);
     always @(posedge clk) begin
         if (reset) begin
                 ax_out <= 0;
