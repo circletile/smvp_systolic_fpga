@@ -1,4 +1,7 @@
-Running: xsim.dir/smvp_systolic_top_behav/xsimk.exe -simmode gui -wdb smvp_systolic_top_behav.wdb -simrunnum 0 -socket 54785
+Running: xsim.dir/smvp_systolic_top_behav/xsimk.exe -simmode gui -wdb smvp_systolic_top_behav.wdb -simrunnum 0 -socket 65337
 Design successfully loaded
-Design Loading Memory Usage: 6056 KB (Peak: 6056 KB)
-Design Loading CPU Usage: 15 ms
+Design Loading Memory Usage: 6764 KB (Peak: 6764 KB)
+Design Loading CPU Usage: 0 ms
+Simulation completed
+Simulation Memory Usage: 15928 KB (Peak: 15928 KB)
+Simulation CPU Usage: 2718 ms

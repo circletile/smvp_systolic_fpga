@@ -1,6 +1,5 @@
 INFO: [VRFC 10-2263] Analyzing Verilog file "E:/Documents/Vivado/Basys3/Projects/smvp_systolic/smvp_systolic.srcs/sources_1/new/smvp_systolic_main.v" into library xil_defaultlib
 INFO: [VRFC 10-311] analyzing module smvp_systolic_top
-INFO: [VRFC 10-311] analyzing module debounce
 INFO: [VRFC 10-311] analyzing module smvp_pe_mult
 INFO: [VRFC 10-311] analyzing module smvp_pe_seladd
 INFO: [VRFC 10-311] analyzing module smvp_pe_accum

@@ -43,20 +43,19 @@ module smvp_systolic_top
     );
         
     // Array Inputs
-    wire [DATA_BIT_LENGTH-1:0] x_j_input;  // TODO: needs BRAM source for x_j
-    wire [DATA_BIT_LENGTH-1:0] a_ij_input [SYS_ARR_ROWS-1:0];  // TODO: needs BRAM source for a_ij
-    wire [OUTPUT_BIT_LENGTH-1:0] i_input [SYS_ARR_ROWS-1:0];  // TODO: needs BRAM source for i
-    
+    wire [DATA_BIT_LENGTH-1:0] x_j_input;
+    wire [DATA_BIT_LENGTH-1:0] a_ij_input [SYS_ARR_ROWS-1:0];
+    wire [OUTPUT_BIT_LENGTH-1:0] i_input [SYS_ARR_ROWS-1:0];
     
     // Array storage
-    reg [DATA_BIT_LENGTH-1:0] x_j [QUEUE_SIZE:0];
+//    reg [DATA_BIT_LENGTH-1:0] x_j [QUEUE_SIZE:0];
     reg [DATA_BIT_LENGTH-1:0] a_ij [SYS_ARR_ROWS-1:0][QUEUE_SIZE-1:0];
     reg [OUTPUT_BIT_LENGTH-1:0] i [SYS_ARR_ROWS-1:0][QUEUE_SIZE-1:0];
     
-    
-    reg [15:0] counter;
-    reg [32:0] big_counter;
-    reg [15:0] total;
+    // Utility Registers
+    reg enable; // Data LUT reazd loop enable (turns data read loop off when end of data reached)
+    reg [15:0] counter; // Tracks number of array columns clocked in, used in data reading and end-of-data detection
+    reg [32:0] big_counter; // Tracks clock cycles, used to cycle LEDs to display accumulator index & value pairs
     
     // PE Interconnects
     wire [DATA_BIT_LENGTH-1:0] ax_xfer [SYS_ARR_COLS:0][SYS_ARR_ROWS:0]; // wires at column index 0 and column last index not used
@@ -65,17 +64,7 @@ module smvp_systolic_top
     wire [DATA_BIT_LENGTH-1:0] mult_xj_sync [SYS_ARR_ROWS:0]; // wires at index 0 and last index not used
     
     // Array Outputs
-    wire [OUTPUT_BIT_LENGTH-1:0] accum_result [SYS_ARR_COLS-1:0];  // TODO: use BRAM or reg for result
-
-    integer iter;
-
-    // BRAM Instantiation
-    // Commented out while COE file not ready for import
-    // TODO: define memory structures for COE file generation
-    //blk_mem_gen_0 tjds_data (.clka(clk),
-    //                         .addra(bram_addr), // Bus [10 : 0] for BRAM QUEUE_SIZE 2048
-	//                         .douta(bram_data_out)  // Bus [7 : 0] for BRAM width 8
-	//                         ); 
+    wire [OUTPUT_BIT_LENGTH-1:0] accum_result [SYS_ARR_COLS-1:0];
 
     // Dynamic PE Module Instantiation
     generate
@@ -151,23 +140,17 @@ module smvp_systolic_top
         end        
     endgenerate
     
-//    reg [15:0] interim_sum [SYS_ARR_ROWS/2];
-    
-//    generate
-//        genvar tree_size;
-//        for (tree_size = 0; tree_size < SYS_ARR_ROWS; tree_size = tree_size + 2) begin
-//            always @(posedge clk) begin
-//                interim_sum[tree_size/2] = accum_result[tree_size] + accum_result[tree_size+1];
-//             end
-//        end
-//    endgenerate    
-
+    // Bind LEDs 0-7 to accumulator outputs and LEDs 8-13 to associated accumulator index   
     assign led[7:0] = accum_result[big_counter[32:28]];
     assign led[13:8] = big_counter[32:28];
+    
+    // Vector input x_j to array is always 1 for this implementation 
+    assign x_j_input = 1'b1;
 
     initial begin
         counter = 0;
         big_counter = 0;
+        enable = 1;
         a_ij[0][0] = 1'b1;
         a_ij[0][1] = 1'b1;
         a_ij[0][2] = 1'b1;
@@ -635,20 +618,14 @@ module smvp_systolic_top
     always @(posedge clk) begin
         counter <= counter + 1;
         big_counter <= big_counter + 1;
+        if(counter > 33) enable = 0; // Stop reading data after longest TJDS data-row has been clocked in (32 for ibm32)
     end
-
-    assign x_j_input = 1'b1;
     
     generate
         // Iterate through rows
         for (row_num = 0; row_num < SYS_ARR_ROWS; row_num = row_num + 1) begin
-            // Iterate through columns
-            for (col_num = 0; col_num < SYS_ARR_COLS; col_num = col_num + 1) begin
-                    
-                assign a_ij_input[row_num] = a_ij[row_num][counter];
-                assign i_input[row_num] = i[row_num][counter];
-                    
-            end
+            assign a_ij_input[row_num] = enable ? a_ij[row_num][counter] : 0;
+            assign i_input[row_num] = enable ? i[row_num][counter] : 0;
         end
     endgenerate
     
@@ -664,19 +641,25 @@ module smvp_pe_mult
       parameter QUEUE_SIZE=33
     )
     (input clk, reset,input [DATA_BIT_LENGTH-1:0] a_ij, input [DATA_BIT_LENGTH-1:0] x_j_in, output reg [DATA_BIT_LENGTH-1:0] product_out, output reg [DATA_BIT_LENGTH-1:0] x_j_out);
-    always @(posedge clk) begin
-//        if (reset) begin
-//            product_out <= 0;
-//            x_j_out <= 0;
-//        end
-//        else product_out <= a_ij * x_j_in;
-        product_out = a_ij & x_j_in;
-        x_j_out = x_j_in;
+    
+    initial begin
+        product_out = 0;
+        x_j_out = 0;
     end
     
-//    always @(posedge clk) begin
-//        x_j_out = x_j_in; // blocking assignment because all multiplier PEs should receive the same value simultaneously
-//    end
+    always @(posedge clk) begin
+        if (reset) begin
+            product_out = 0;
+            x_j_out = 0;
+        end
+        else product_out <= a_ij * x_j_in;
+//        product_out = a_ij & x_j_in;
+//        x_j_out = x_j_in;
+    end
+    
+    always @(x_j_in) begin
+        x_j_out = x_j_in; // blocking assignment because all multiplier PEs should receive the same value simultaneously
+    end
 
 endmodule
 
@@ -689,11 +672,18 @@ module smvp_pe_seladd
       parameter QUEUE_SIZE=33
     )
     (input clk, reset, input [DATA_BIT_LENGTH-1:0] ax_in, input [OUTPUT_BIT_LENGTH-1:0] i_in, input [OUTPUT_BIT_LENGTH-1:0] accum_in, output reg ax_out, output reg [OUTPUT_BIT_LENGTH-1:0] i_out, output reg [OUTPUT_BIT_LENGTH-1:0] accum_out);
+    
+    initial begin
+        ax_out = 0;
+        i_out = 0;
+        accum_out = 0;
+    end
+    
     always @(posedge clk) begin
         if (reset) begin
-                ax_out <= 0;
-                i_out <= 0;
-                accum_out <= 0;
+                ax_out = 0;
+                i_out = 0;
+                accum_out = 0;
         end
         else begin
             case (i_in)
@@ -709,18 +699,6 @@ module smvp_pe_seladd
                 end
             endcase
         end
-//        case (i_in)
-//            0: begin
-//                ax_out <= 0;
-//                i_out <= 0;
-//                accum_out <= ax_in + accum_in;
-//            end
-//            default: begin
-//                ax_out <= ax_in;
-//                i_out <= i_in - 1;
-//                accum_out <= 0;
-//            end
-//        endcase
     end
 endmodule
 
@@ -733,9 +711,11 @@ module smvp_pe_accum
       parameter QUEUE_SIZE=33
     )
     (input clk, reset, input [OUTPUT_BIT_LENGTH-1:0] accum_in, output reg [OUTPUT_BIT_LENGTH-1:0] sum);
+    
+    initial sum = 0;
+    
     always @(posedge clk) begin
-        if (reset) sum <= 0;
+        if (reset) sum = 0;
         else sum <= sum + accum_in;
-//        sum <= sum + accum_in;
     end
 endmodule
