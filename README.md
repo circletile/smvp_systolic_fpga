@@ -7,6 +7,6 @@ Repo contents are just copy/pastes of the Vivado project folder.
 
 The most important files are:
 
-smvp_systolic.srcs/sources_1/new/smvp_systolic_main.v
+https://github.com/circletile/smvp_systolic_fpga/blob/main/smvp_systolic.srcs/sources_1/new/smvp_systolic_main.v
 
-smvp_systolic.srcs\constrs_1\imports\XDC\Basys3_Master.xdc
+https://github.com/circletile/smvp_systolic_fpga/blob/main/ssmvp_systolic.srcs\constrs_1\imports\XDC\Basys3_Master.xdc
