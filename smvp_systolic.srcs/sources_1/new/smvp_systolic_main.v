@@ -37,46 +37,45 @@ module smvp_systolic_top
     
     // Basys3 Button Inputs (defined in constraints)
     input btnC,
+    input btnL,
+    input btnR,
 
-    // Basys3 LEDs
-    output [15:0] led
+    // Basys3 Switch LEDs
+    output [15:0] led,
+    
+    // Basys3 7seg LEDs
+    output [6:0] seg,
+    output [0:0] dp,
+    output [3:0] an
     );
         
     // Array Inputs
-    wire [DATA_BIT_LENGTH-1:0] x_j_input;  // TODO: needs BRAM source for x_j
-    wire [DATA_BIT_LENGTH-1:0] a_ij_input [SYS_ARR_ROWS-1:0];  // TODO: needs BRAM source for a_ij
-    wire [OUTPUT_BIT_LENGTH-1:0] i_input [SYS_ARR_ROWS-1:0];  // TODO: needs BRAM source for i
-    
+    wire [DATA_BIT_LENGTH-1:0] x_j_input;
+    wire [DATA_BIT_LENGTH-1:0] a_ij_input [SYS_ARR_ROWS-1:0];
+    wire [OUTPUT_BIT_LENGTH-1:0] i_input [SYS_ARR_ROWS-1:0];
     
     // Array storage
-    reg [DATA_BIT_LENGTH-1:0] x_j [QUEUE_SIZE:0];
     reg [DATA_BIT_LENGTH-1:0] a_ij [SYS_ARR_ROWS-1:0][QUEUE_SIZE-1:0];
     reg [OUTPUT_BIT_LENGTH-1:0] i [SYS_ARR_ROWS-1:0][QUEUE_SIZE-1:0];
     
-    
-    reg [15:0] counter;
-    reg [32:0] big_counter;
-    reg [15:0] total;
+    // Utility Registers
+    reg enable; // Data LUT reazd loop enable (turns data read loop off when end of data reached)
+    reg [15:0] counter; // Tracks number of array columns clocked in, used in data reading and end-of-data detection
+    reg [32:0] big_counter; // Tracks clock cycles, used to cycle LEDs to display accumulator index & value pairs
+    reg [4:0] scroll_index;
+    reg [7:0] scroll_value;
+    wire stable_btnL, stable_btnR;
     
     // PE Interconnects
-    wire [DATA_BIT_LENGTH-1:0] ax_xfer [SYS_ARR_COLS:0][SYS_ARR_ROWS:0]; // wires at column index 0 and column last index not used
+    wire [DATA_BIT_LENGTH-1:0] ax_xfer [SYS_ARR_COLS:0][SYS_ARR_ROWS:0]; // wires at column last index not used
     wire [OUTPUT_BIT_LENGTH-1:0] i_xfer [SYS_ARR_COLS:0][SYS_ARR_ROWS:0]; // wires at column index 0 and column last index not used
+    wire [OUTPUT_BIT_LENGTH-1:0] i_delay [SYS_ARR_ROWS:0];
     wire [OUTPUT_BIT_LENGTH-1:0] accum_xfer [SYS_ARR_COLS:0][SYS_ARR_ROWS:0]; // wire at row index 0 not used
     wire [DATA_BIT_LENGTH-1:0] mult_xj_sync [SYS_ARR_ROWS:0]; // wires at index 0 and last index not used
     
     // Array Outputs
-    wire [OUTPUT_BIT_LENGTH-1:0] accum_result [SYS_ARR_COLS-1:0];  // TODO: use BRAM or reg for result
-
-    integer iter;
-
-    // BRAM Instantiation
-    // Commented out while COE file not ready for import
-    // TODO: define memory structures for COE file generation
-    //blk_mem_gen_0 tjds_data (.clka(clk),
-    //                         .addra(bram_addr), // Bus [10 : 0] for BRAM QUEUE_SIZE 2048
-	//                         .douta(bram_data_out)  // Bus [7 : 0] for BRAM width 8
-	//                         ); 
-
+    wire [OUTPUT_BIT_LENGTH-1:0] accum_result [SYS_ARR_COLS-1:0];
+   
     // Dynamic PE Module Instantiation
     generate
         genvar row_num, col_num;
@@ -110,10 +109,14 @@ module smvp_systolic_top
                 //
                 
                 if (col_num == 0 && row_num == 0) begin
+                    // Generate "west-edge" i_input one-cycle delay support elements (first column)
+                    smvp_io_idelay io_idelay( .clk(clk), .reset(btnC), 
+                                          .i_in(i_input[row_num]), .i_out(i_delay[row_num]) );
+                
                     // Generate "northwest" selective adder PE (single instance, location [0,0])
                     smvp_pe_seladd sel_add( .clk(clk), .reset(btnC),
                                             .ax_in(ax_xfer[col_num][row_num]), .ax_out(ax_xfer[col_num + 1][row_num]),
-                                            .i_in(i_input[row_num]), .i_out(i_xfer[col_num + 1][row_num]),
+                                            .i_in(i_delay[row_num]), .i_out(i_xfer[col_num + 1][row_num]),
                                             .accum_in(8'b0), .accum_out(accum_xfer[col_num][row_num + 1]) );                                    
                 end
                 else if (row_num == 0) begin
@@ -124,10 +127,14 @@ module smvp_systolic_top
                                             .accum_in(8'b0), .accum_out(accum_xfer[col_num][row_num + 1]) );                                    
                 end
                 else if (col_num == 0) begin
+                    // Generate "west-edge" i_input one-cycle delay support elements (first column)
+                    smvp_io_idelay io_idelay( .clk(clk), .reset(btnC), 
+                                          .i_in(i_input[row_num]), .i_out(i_delay[row_num]) );
+                                          
                     // Generate "west-edge" selective adder PEs (first column)
                     smvp_pe_seladd sel_add( .clk(clk), .reset(btnC),
                                             .ax_in(ax_xfer[col_num][row_num]), .ax_out(ax_xfer[col_num + 1][row_num]),
-                                            .i_in(i_input[row_num]), .i_out(i_xfer[col_num + 1][row_num]),
+                                            .i_in(i_delay[row_num]), .i_out(i_xfer[col_num + 1][row_num]),
                                             .accum_in(accum_xfer[col_num][row_num]), .accum_out(accum_xfer[col_num][row_num + 1]) );                                    
                 end
                 else begin
@@ -151,23 +158,24 @@ module smvp_systolic_top
         end        
     endgenerate
     
-//    reg [15:0] interim_sum [SYS_ARR_ROWS/2];
-    
-//    generate
-//        genvar tree_size;
-//        for (tree_size = 0; tree_size < SYS_ARR_ROWS; tree_size = tree_size + 2) begin
-//            always @(posedge clk) begin
-//                interim_sum[tree_size/2] = accum_result[tree_size] + accum_result[tree_size+1];
-//             end
-//        end
-//    endgenerate    
-
+    // Bind LEDs 0-7 to accumulator outputs and LEDs 8-13 to associated accumulator index   
     assign led[7:0] = accum_result[big_counter[32:28]];
     assign led[13:8] = big_counter[32:28];
+    
+    // Also bind segment LEDs to accumulator indices and outputs
+    basys3_numled_driver numled_driver( .clk(clk), .reset(btnC),
+                                        .accum_num(scroll_index), .accum_val(scroll_value),
+                                        .port(an), .segments(seg), .dp(dp)
+                                      );                            
+  
+    // Vector input x_j to array is always 1 for this implementation 
+    assign x_j_input = 1'b1;
 
     initial begin
         counter = 0;
         big_counter = 0;
+        enable = 1;
+        scroll_index = 0;
         a_ij[0][0] = 1'b1;
         a_ij[0][1] = 1'b1;
         a_ij[0][2] = 1'b1;
@@ -632,23 +640,26 @@ module smvp_systolic_top
         i[6][32] = 1'b0;     
     end
 
+    PushButton_Debouncer pb_db_btnL (.clk(clk), .PB(btnL), .PB_down(stable_btnL) );
+    PushButton_Debouncer pb_db_btnR (.clk(clk), .PB(btnR), .PB_down(stable_btnR) );
+
     always @(posedge clk) begin
         counter <= counter + 1;
         big_counter <= big_counter + 1;
+        if(counter > SYS_ARR_COLS - 1) enable = 0; // Stop reading data after longest TJDS data-row has been clocked in
+                
+        // Update segment LED with currently selected accumulator index
+        if (stable_btnL) scroll_index <= scroll_index - 1;
+        else if (stable_btnR) scroll_index <= scroll_index + 1;
+        scroll_value <= accum_result[scroll_index];
+        
     end
-
-    assign x_j_input = 1'b1;
     
     generate
         // Iterate through rows
         for (row_num = 0; row_num < SYS_ARR_ROWS; row_num = row_num + 1) begin
-            // Iterate through columns
-            for (col_num = 0; col_num < SYS_ARR_COLS; col_num = col_num + 1) begin
-                    
-                assign a_ij_input[row_num] = a_ij[row_num][counter];
-                assign i_input[row_num] = i[row_num][counter];
-                    
-            end
+            assign a_ij_input[row_num] = enable ? a_ij[row_num][counter] : 0;
+            assign i_input[row_num] = enable ? i[row_num][counter] : 0;
         end
     endgenerate
     
@@ -664,19 +675,23 @@ module smvp_pe_mult
       parameter QUEUE_SIZE=33
     )
     (input clk, reset,input [DATA_BIT_LENGTH-1:0] a_ij, input [DATA_BIT_LENGTH-1:0] x_j_in, output reg [DATA_BIT_LENGTH-1:0] product_out, output reg [DATA_BIT_LENGTH-1:0] x_j_out);
-    always @(posedge clk) begin
-//        if (reset) begin
-//            product_out <= 0;
-//            x_j_out <= 0;
-//        end
-//        else product_out <= a_ij * x_j_in;
-        product_out = a_ij & x_j_in;
-        x_j_out = x_j_in;
+    
+    initial begin
+        product_out = 0;
+        x_j_out = 0;
     end
     
-//    always @(posedge clk) begin
-//        x_j_out = x_j_in; // blocking assignment because all multiplier PEs should receive the same value simultaneously
-//    end
+    always @(posedge clk) begin
+        if (reset) begin
+            product_out = 0;
+//            x_j_out = 0; // synthesis complains about being dual-driven by VCC when this line is enabled
+        end
+        else product_out <= a_ij * x_j_in;
+    end
+    
+    always @(x_j_in) begin
+        x_j_out = x_j_in; // blocking assignment because all multiplier PEs should receive the same value simultaneously
+    end
 
 endmodule
 
@@ -688,39 +703,34 @@ module smvp_pe_seladd
       parameter OUTPUT_BIT_LENGTH=8,
       parameter QUEUE_SIZE=33
     )
-    (input clk, reset, input [DATA_BIT_LENGTH-1:0] ax_in, input [OUTPUT_BIT_LENGTH-1:0] i_in, input [OUTPUT_BIT_LENGTH-1:0] accum_in, output reg ax_out, output reg [OUTPUT_BIT_LENGTH-1:0] i_out, output reg [OUTPUT_BIT_LENGTH-1:0] accum_out);
+    (input clk, reset, input [DATA_BIT_LENGTH-1:0] ax_in, input [OUTPUT_BIT_LENGTH-1:0] i_in, input [OUTPUT_BIT_LENGTH-1:0] accum_in, output reg [DATA_BIT_LENGTH-1:0] ax_out, output reg [OUTPUT_BIT_LENGTH-1:0] i_out, output reg [OUTPUT_BIT_LENGTH-1:0] accum_out);
+    
+    initial begin
+        ax_out = 0;
+        i_out = 0;
+        accum_out = 0;
+    end
+    
     always @(posedge clk) begin
         if (reset) begin
-                ax_out <= 0;
-                i_out <= 0;
-                accum_out <= 0;
+                ax_out = 0;
+                i_out = 0;
+                accum_out = 0;
         end
         else begin
             case (i_in)
                 0: begin
                     ax_out <= 0;
-                    i_out <= 0;
+                    i_out <= i_in;
                     accum_out <= ax_in + accum_in;
                 end
                 default: begin
                     ax_out <= ax_in;
                     i_out <= i_in - 1;
-                    accum_out <= 0;
+                    accum_out <= accum_in;
                 end
             endcase
         end
-//        case (i_in)
-//            0: begin
-//                ax_out <= 0;
-//                i_out <= 0;
-//                accum_out <= ax_in + accum_in;
-//            end
-//            default: begin
-//                ax_out <= ax_in;
-//                i_out <= i_in - 1;
-//                accum_out <= 0;
-//            end
-//        endcase
     end
 endmodule
 
@@ -733,9 +743,136 @@ module smvp_pe_accum
       parameter QUEUE_SIZE=33
     )
     (input clk, reset, input [OUTPUT_BIT_LENGTH-1:0] accum_in, output reg [OUTPUT_BIT_LENGTH-1:0] sum);
+    
+    initial sum = 0;
+    
     always @(posedge clk) begin
-        if (reset) sum <= 0;
+        if (reset) sum = 0;
         else sum <= sum + accum_in;
-//        sum <= sum + accum_in;
     end
+endmodule
+
+// Module: SMVP I/O Support Element - I-Value Delay
+// Delays i-value intake to west-edge selective adders so it arrives at the same time as its corresponding ax_xfer value
+module smvp_io_idelay    
+    #(parameter SYS_ARR_COLS=33,
+      parameter SYS_ARR_ROWS=7,
+      parameter DATA_BIT_LENGTH=1,
+      parameter OUTPUT_BIT_LENGTH=8,
+      parameter QUEUE_SIZE=33
+    )
+    (input clk, reset,input [OUTPUT_BIT_LENGTH-1:0] i_in, output reg [OUTPUT_BIT_LENGTH-1:0] i_out);
+    initial i_out = 0;
+    always @(posedge clk) begin
+        if (reset) i_out = 0;
+        else i_out <= i_in;
+    end
+endmodule
+
+// Module: Basys3 Seven Segment Display Driver
+// ref: https://www.fpga4student.com/2017/09/seven-segment-led-display-controller-basys3-fpga.html
+module basys3_numled_driver( input clk, input reset,
+                             input [7:0] accum_num,
+                             input [7:0] accum_val,
+                             output reg [3:0] port, // anode signals of the 7-segment LED display
+                             output reg [6:0] segments, // cathode patterns of the 7-segment LED display
+                             output reg [0:0] dp
+                            );
+    
+    wire [1:0] port_sel;
+    reg [3:0] LED_BCD;
+    reg [19:0] refresh_counter; // 20-bit for creating 10.5ms refresh period or 380Hz refresh rate
+                                // the first 2 MSB bits for creating 4 LED-activating signals
+
+    always @(posedge clk or posedge reset) begin 
+        if(reset == 1) begin
+            refresh_counter <= 0;
+        end
+        else begin
+            refresh_counter <= refresh_counter + 1;
+        end
+    end 
+    
+    assign port_sel = refresh_counter[19:18]; // anode activating signals for 4 LEDs, digit period of 2.6ms
+                                                            // decoder to generate anode signals 
+    always @(*) begin
+        case(port_sel)
+        2'b00: begin
+            port = 4'b0111; // activate LED1 and Deactivate LED2, LED3, LED4
+            LED_BCD = accum_num / 10; // the tens digit of the 8-bit number
+            dp = 1;
+        end
+        2'b01: begin
+            port = 4'b1011; // activate LED2 and Deactivate LED1, LED3, LED4
+            LED_BCD = accum_num % 10; // the ones digit of the 8-bit number
+            dp = 0;
+        end
+        2'b10: begin
+            port = 4'b1101; // activate LED3 and Deactivate LED2, LED1, LED4
+            LED_BCD = accum_val / 10; // the tens digit of the 8-bit number
+            dp = 1;
+        end
+        2'b11: begin
+            port = 4'b1110; // activate LED4 and Deactivate LED2, LED3, LED1
+            LED_BCD = accum_val % 10; // the ones digit of the 8-bit number
+            dp = 1;    
+        end
+        endcase
+    end
+    
+    // Cathode patterns of the 7-segment LED display 
+    always @(*)
+    begin
+        case(LED_BCD)
+            // The above reference website implements BCD ports in the constraints file BACKWARDS
+            // Gives you garbage output until you invert the segment bit order, which is done as follows 
+            4'b0000: segments = 7'b1000000; // "0"     
+            4'b0001: segments = 7'b1111001; // "1" 
+            4'b0010: segments = 7'b0100100; // "2" 
+            4'b0011: segments = 7'b0110000; // "3" 
+            4'b0100: segments = 7'b0011001; // "4"
+            4'b0101: segments = 7'b0010010; // "5"
+            4'b0110: segments = 7'b0000010; // "6" 
+            4'b0111: segments = 7'b1111000; // "7"
+            4'b1000: segments = 7'b0000000; // "8"     
+            4'b1001: segments = 7'b0010000; // "9" 
+            default: segments = 7'b1000000; // "0"
+        endcase
+    end
+ endmodule
+ 
+// Module: Button Debounce
+// ref: https://www.fpga4fun.com/Debouncer2.html
+module PushButton_Debouncer(
+    input clk,
+    input PB,  // "PB" is the glitchy, asynchronous to clk, active low push-button signal
+
+    // from which we make three outputs, all synchronous to the clock
+    output reg PB_state,  // 1 as long as the push-button is active (down)
+    output PB_down,  // 1 for one clock cycle when the push-button goes down (i.e. just pushed)
+    output PB_up   // 1 for one clock cycle when the push-button goes up (i.e. just released)
+    );
+
+    // First use two flip-flops to synchronize the PB signal the "clk" clock domain
+    reg PB_sync_0;  always @(posedge clk) PB_sync_0 <= ~PB;  // invert PB to make PB_sync_0 active high
+    reg PB_sync_1;  always @(posedge clk) PB_sync_1 <= PB_sync_0;
+
+    // Next declare a 16-bits counter
+    reg [15:0] PB_cnt;
+
+    // When the push-button is pushed or released, we increment the counter
+    // The counter has to be maxed out before we decide that the push-button state has changed!
+    wire PB_idle = (PB_state==PB_sync_1);
+    wire PB_cnt_max = &PB_cnt;	// true when all bits of PB_cnt are 1's
+    
+    always @(posedge clk)
+        if(PB_idle)
+        PB_cnt <= 0;  // nothing's going on
+        else begin
+            PB_cnt <= PB_cnt + 16'd1;  // something's going on, increment the counter
+            if(PB_cnt_max) PB_state <= ~PB_state;  // if the counter is maxed out, PB changed!
+        end
+
+        assign PB_down = ~PB_idle & PB_cnt_max & ~PB_state;
+        assign PB_up   = ~PB_idle & PB_cnt_max &  PB_state;
 endmodule
