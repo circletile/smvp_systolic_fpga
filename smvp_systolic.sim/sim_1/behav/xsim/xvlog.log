@@ -3,3 +3,4 @@ INFO: [VRFC 10-311] analyzing module smvp_systolic_top
 INFO: [VRFC 10-311] analyzing module smvp_pe_mult
 INFO: [VRFC 10-311] analyzing module smvp_pe_seladd
 INFO: [VRFC 10-311] analyzing module smvp_pe_accum
+INFO: [VRFC 10-311] analyzing module smvp_io_idelay

@@ -58,10 +58,12 @@ module smvp_systolic_top
     reg [32:0] big_counter; // Tracks clock cycles, used to cycle LEDs to display accumulator index & value pairs
     
     // PE Interconnects
-    wire [DATA_BIT_LENGTH-1:0] ax_xfer [SYS_ARR_COLS:0][SYS_ARR_ROWS:0]; // wires at column index 0 and column last index not used
+    wire [DATA_BIT_LENGTH-1:0] ax_xfer [SYS_ARR_COLS:0][SYS_ARR_ROWS:0]; // wires at column last index not used
     wire [OUTPUT_BIT_LENGTH-1:0] i_xfer [SYS_ARR_COLS:0][SYS_ARR_ROWS:0]; // wires at column index 0 and column last index not used
+    wire [OUTPUT_BIT_LENGTH-1:0] i_delay [SYS_ARR_ROWS:0];
     wire [OUTPUT_BIT_LENGTH-1:0] accum_xfer [SYS_ARR_COLS:0][SYS_ARR_ROWS:0]; // wire at row index 0 not used
     wire [DATA_BIT_LENGTH-1:0] mult_xj_sync [SYS_ARR_ROWS:0]; // wires at index 0 and last index not used
+    
     
     // Array Outputs
     wire [OUTPUT_BIT_LENGTH-1:0] accum_result [SYS_ARR_COLS-1:0];
@@ -99,10 +101,14 @@ module smvp_systolic_top
                 //
                 
                 if (col_num == 0 && row_num == 0) begin
+                    // Generate "west-edge" i_input one-cycle delay support elements (first column)
+                    smvp_io_idelay io_idelay( .clk(clk), .reset(btnC), 
+                                          .i_in(i_input[row_num]), .i_out(i_delay[row_num]) );
+                
                     // Generate "northwest" selective adder PE (single instance, location [0,0])
                     smvp_pe_seladd sel_add( .clk(clk), .reset(btnC),
                                             .ax_in(ax_xfer[col_num][row_num]), .ax_out(ax_xfer[col_num + 1][row_num]),
-                                            .i_in(i_input[row_num]), .i_out(i_xfer[col_num + 1][row_num]),
+                                            .i_in(i_delay[row_num]), .i_out(i_xfer[col_num + 1][row_num]),
                                             .accum_in(8'b0), .accum_out(accum_xfer[col_num][row_num + 1]) );                                    
                 end
                 else if (row_num == 0) begin
@@ -113,10 +119,14 @@ module smvp_systolic_top
                                             .accum_in(8'b0), .accum_out(accum_xfer[col_num][row_num + 1]) );                                    
                 end
                 else if (col_num == 0) begin
+                    // Generate "west-edge" i_input one-cycle delay support elements (first column)
+                    smvp_io_idelay io_idelay( .clk(clk), .reset(btnC), 
+                                          .i_in(i_input[row_num]), .i_out(i_delay[row_num]) );
+                                          
                     // Generate "west-edge" selective adder PEs (first column)
                     smvp_pe_seladd sel_add( .clk(clk), .reset(btnC),
                                             .ax_in(ax_xfer[col_num][row_num]), .ax_out(ax_xfer[col_num + 1][row_num]),
-                                            .i_in(i_input[row_num]), .i_out(i_xfer[col_num + 1][row_num]),
+                                            .i_in(i_delay[row_num]), .i_out(i_xfer[col_num + 1][row_num]),
                                             .accum_in(accum_xfer[col_num][row_num]), .accum_out(accum_xfer[col_num][row_num + 1]) );                                    
                 end
                 else begin
@@ -618,7 +628,7 @@ module smvp_systolic_top
     always @(posedge clk) begin
         counter <= counter + 1;
         big_counter <= big_counter + 1;
-        if(counter > 33) enable = 0; // Stop reading data after longest TJDS data-row has been clocked in (32 for ibm32)
+        if(counter > SYS_ARR_COLS - 1) enable = 0; // Stop reading data after longest TJDS data-row has been clocked in
     end
     
     generate
@@ -650,11 +660,9 @@ module smvp_pe_mult
     always @(posedge clk) begin
         if (reset) begin
             product_out = 0;
-            x_j_out = 0;
+//            x_j_out = 0; // synthesis complains about being dual-driven by VCC when this line is enabled
         end
         else product_out <= a_ij * x_j_in;
-//        product_out = a_ij & x_j_in;
-//        x_j_out = x_j_in;
     end
     
     always @(x_j_in) begin
@@ -671,7 +679,7 @@ module smvp_pe_seladd
       parameter OUTPUT_BIT_LENGTH=8,
       parameter QUEUE_SIZE=33
     )
-    (input clk, reset, input [DATA_BIT_LENGTH-1:0] ax_in, input [OUTPUT_BIT_LENGTH-1:0] i_in, input [OUTPUT_BIT_LENGTH-1:0] accum_in, output reg ax_out, output reg [OUTPUT_BIT_LENGTH-1:0] i_out, output reg [OUTPUT_BIT_LENGTH-1:0] accum_out);
+    (input clk, reset, input [DATA_BIT_LENGTH-1:0] ax_in, input [OUTPUT_BIT_LENGTH-1:0] i_in, input [OUTPUT_BIT_LENGTH-1:0] accum_in, output reg [DATA_BIT_LENGTH-1:0] ax_out, output reg [OUTPUT_BIT_LENGTH-1:0] i_out, output reg [OUTPUT_BIT_LENGTH-1:0] accum_out);
     
     initial begin
         ax_out = 0;
@@ -689,13 +697,13 @@ module smvp_pe_seladd
             case (i_in)
                 0: begin
                     ax_out <= 0;
-                    i_out <= 0;
+                    i_out <= i_in;
                     accum_out <= ax_in + accum_in;
                 end
                 default: begin
                     ax_out <= ax_in;
                     i_out <= i_in - 1;
-                    accum_out <= 0;
+                    accum_out <= accum_in;
                 end
             endcase
         end
@@ -717,5 +725,22 @@ module smvp_pe_accum
     always @(posedge clk) begin
         if (reset) sum = 0;
         else sum <= sum + accum_in;
+    end
+endmodule
+
+// Module: SMVP I/O Support Element - I-Value Delay
+// Delays i-value intake to west-edge selective adders so it arrives at the same time as its corresponding ax_xfer value
+module smvp_io_idelay    
+    #(parameter SYS_ARR_COLS=33,
+      parameter SYS_ARR_ROWS=7,
+      parameter DATA_BIT_LENGTH=1,
+      parameter OUTPUT_BIT_LENGTH=8,
+      parameter QUEUE_SIZE=33
+    )
+    (input clk, reset,input [OUTPUT_BIT_LENGTH-1:0] i_in, output reg [OUTPUT_BIT_LENGTH-1:0] i_out);
+    initial i_out = 0;
+    always @(posedge clk) begin
+        if (reset) i_out = 0;
+        else i_out <= i_in;
     end
 endmodule

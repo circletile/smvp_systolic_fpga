@@ -9,6 +9,7 @@ Starting simulation data flow analysis
 Completed simulation data flow analysis
 Time Resolution for simulation is 1ps
 Compiling module xil_defaultlib.smvp_pe_mult
+Compiling module xil_defaultlib.smvp_io_idelay
 Compiling module xil_defaultlib.smvp_pe_seladd
 Compiling module xil_defaultlib.smvp_pe_accum
 Compiling module xil_defaultlib.smvp_systolic_top

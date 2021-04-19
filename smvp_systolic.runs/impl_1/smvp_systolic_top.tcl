@@ -115,6 +115,8 @@ proc step_failed { step } {
 OPTRACE "impl_1" END { }
 }
 
+set_msg_config -id {Synth 8-256} -limit 10000
+set_msg_config -id {Synth 8-638} -limit 10000
 
 OPTRACE "impl_1" START { ROLLUP_1 }
 OPTRACE "Phase: Init Design" START { ROLLUP_AUTO }
@@ -124,12 +126,30 @@ set rc [catch {
   create_msg_db init_design.pb
   set_param chipscope.maxJobs 6
   set_param xicom.use_bs_reader 1
-  reset_param project.defaultXPMLibraries 
-  open_checkpoint E:/Documents/Vivado/Basys3/Projects/smvp_systolic/smvp_systolic.runs/impl_1/smvp_systolic_top.dcp
+OPTRACE "create in-memory project" START { }
+  create_project -in_memory -part xc7a35tcpg236-1
+  set_property board_part_repo_paths {C:/Users/cupchurch/AppData/Roaming/Xilinx/Vivado/2020.2/xhub/board_store/xilinx_board_store} [current_project]
+  set_property board_part digilentinc.com:basys3:part0:1.1 [current_project]
+  set_property design_mode GateLvl [current_fileset]
+  set_param project.singleFileAddWarning.threshold 0
+OPTRACE "create in-memory project" END { }
+OPTRACE "set parameters" START { }
   set_property webtalk.parent_dir E:/Documents/Vivado/Basys3/Projects/smvp_systolic/smvp_systolic.cache/wt [current_project]
   set_property parent.project_path E:/Documents/Vivado/Basys3/Projects/smvp_systolic/smvp_systolic.xpr [current_project]
   set_property ip_output_repo E:/Documents/Vivado/Basys3/Projects/smvp_systolic/smvp_systolic.cache/ip [current_project]
   set_property ip_cache_permissions {read write} [current_project]
+OPTRACE "set parameters" END { }
+OPTRACE "add files" START { }
+  add_files -quiet E:/Documents/Vivado/Basys3/Projects/smvp_systolic/smvp_systolic.runs/synth_1/smvp_systolic_top.dcp
+OPTRACE "read constraints: implementation" START { }
+  read_xdc E:/Documents/Vivado/Basys3/Projects/smvp_systolic/smvp_systolic.srcs/constrs_1/imports/XDC/Basys3_Master.xdc
+OPTRACE "read constraints: implementation" END { }
+OPTRACE "add files" END { }
+OPTRACE "link_design" START { }
+  link_design -top smvp_systolic_top -part xc7a35tcpg236-1
+OPTRACE "link_design" END { }
+OPTRACE "gray box cells" START { }
+OPTRACE "gray box cells" END { }
 OPTRACE "init_design_reports" START { REPORT }
 OPTRACE "init_design_reports" END { }
 OPTRACE "init_design_write_hwdef" START { }
