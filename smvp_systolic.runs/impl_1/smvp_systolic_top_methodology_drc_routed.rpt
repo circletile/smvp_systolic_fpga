@@ -1,7 +1,7 @@
 Copyright 1986-2020 Xilinx, Inc. All Rights Reserved.
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2020.2 (win64) Build 3064766 Wed Nov 18 09:12:45 MST 2020
-| Date         : Thu Apr 22 01:44:29 2021
+| Date         : Thu Apr 22 04:10:07 2021
 | Host         : CCB-011 running 64-bit major release  (build 9200)
 | Command      : report_methodology -file smvp_systolic_top_methodology_drc_routed.rpt -pb smvp_systolic_top_methodology_drc_routed.pb -rpx smvp_systolic_top_methodology_drc_routed.rpx
 | Design       : smvp_systolic_top

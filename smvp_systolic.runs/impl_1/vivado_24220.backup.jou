@@ -2,8 +2,8 @@
 # Vivado v2020.2 (64-bit)
 # SW Build 3064766 on Wed Nov 18 09:12:45 MST 2020
 # IP Build 3064653 on Wed Nov 18 14:17:31 MST 2020
-# Start of session at: Thu Apr 22 04:09:10 2021
-# Process ID: 28764
+# Start of session at: Thu Apr 22 02:16:18 2021
+# Process ID: 24220
 # Current directory: E:/Documents/Vivado/Basys3/Projects/smvp_systolic/smvp_systolic.runs/impl_1
 # Command line: vivado.exe -log smvp_systolic_top.vdi -applog -product Vivado -messageDb vivado.pb -mode batch -source smvp_systolic_top.tcl -notrace
 # Log file: E:/Documents/Vivado/Basys3/Projects/smvp_systolic/smvp_systolic.runs/impl_1/smvp_systolic_top.vdi

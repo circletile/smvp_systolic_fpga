@@ -1,7 +1,7 @@
 Copyright 1986-2020 Xilinx, Inc. All Rights Reserved.
 ----------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2020.2 (win64) Build 3064766 Wed Nov 18 09:12:45 MST 2020
-| Date         : Thu Apr 22 01:44:04 2021
+| Date         : Thu Apr 22 04:09:42 2021
 | Host         : CCB-011 running 64-bit major release  (build 9200)
 | Command      : report_control_sets -verbose -file smvp_systolic_top_control_sets_placed.rpt
 | Design       : smvp_systolic_top
@@ -23,11 +23,11 @@ Table of Contents
 +----------------------------------------------------------+-------+
 |                          Status                          | Count |
 +----------------------------------------------------------+-------+
-| Total control sets                                       |   228 |
-|    Minimum number of control sets                        |   228 |
+| Total control sets                                       |   221 |
+|    Minimum number of control sets                        |   221 |
 |    Addition due to synthesis replication                 |     0 |
 |    Addition due to physical synthesis replication        |     0 |
-| Unused register locations in slices containing registers |    24 |
+| Unused register locations in slices containing registers |     7 |
 +----------------------------------------------------------+-------+
 * Control sets can be merged at opt_design using control_set_merge or merge_equivalent_drivers
 ** Run report_qor_suggestions for automated merging and remapping suggestions
@@ -39,11 +39,11 @@ Table of Contents
 +--------------------+-------+
 |       Fanout       | Count |
 +--------------------+-------+
-| Total control sets |   228 |
+| Total control sets |   221 |
 | >= 0 to < 4        |     0 |
-| >= 4 to < 6        |     1 |
-| >= 6 to < 8        |    12 |
-| >= 8 to < 10       |   211 |
+| >= 4 to < 6        |     0 |
+| >= 6 to < 8        |     4 |
+| >= 8 to < 10       |   213 |
 | >= 10 to < 12      |     0 |
 | >= 12 to < 14      |     0 |
 | >= 14 to < 16      |     0 |
@@ -58,9 +58,9 @@ Table of Contents
 +--------------+-----------------------+------------------------+-----------------+--------------+
 | Clock Enable | Synchronous Set/Reset | Asynchronous Set/Reset | Total Registers | Total Slices |
 +--------------+-----------------------+------------------------+-----------------+--------------+
-| No           | No                    | No                     |             286 |          148 |
+| No           | No                    | No                     |             247 |          136 |
 | No           | No                    | Yes                    |              20 |            5 |
-| No           | Yes                   | No                     |            3022 |          899 |
+| No           | Yes                   | No                     |            2774 |          847 |
 | Yes          | No                    | No                     |               8 |            4 |
 | Yes          | No                    | Yes                    |               0 |            0 |
 | Yes          | Yes                   | No                     |               0 |            0 |
@@ -70,237 +70,230 @@ Table of Contents
 4. Detailed Control Set Information
 -----------------------------------
 
-+----------------+-----------------+------------------------------------------------+------------------+----------------+--------------+
-|  Clock Signal  |  Enable Signal  |                Set/Reset Signal                | Slice Load Count | Bel Load Count | Bels / Slice |
-+----------------+-----------------+------------------------------------------------+------------------+----------------+--------------+
-|  clk_IBUF_BUFG |                 | genblk1[6].genblk1[0].sel_add/i_out_reg[0]_0   |                1 |              4 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[0].io_idelay/i_out_reg[4]_0 |                2 |              6 |         3.00 |
-|  clk_IBUF_BUFG |                 | genblk1[4].genblk1[0].io_idelay/i_out_reg[4]_0 |                2 |              6 |         3.00 |
-|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[0].io_idelay/i_out_reg[4]_0 |                2 |              6 |         3.00 |
-|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[0].io_idelay/i_out_reg[4]_0 |                2 |              6 |         3.00 |
-|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[0].sel_add/btnC             |                2 |              7 |         3.50 |
-|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[0].sel_add/btnC             |                3 |              7 |         2.33 |
-|  clk_IBUF_BUFG |                 | genblk1[5].genblk1[0].sel_add/btnC             |                3 |              7 |         2.33 |
-|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[0].io_idelay/i_out_reg[2]_1 |                1 |              7 |         7.00 |
-|  clk_IBUF_BUFG |                 | genblk1[5].genblk1[0].io_idelay/i_out_reg[2]_0 |                1 |              7 |         7.00 |
-|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[0].sel_add/btnC             |                2 |              7 |         3.50 |
-|  clk_IBUF_BUFG |                 | genblk1[4].genblk1[0].sel_add/btnC             |                2 |              7 |         3.50 |
-|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[0].sel_add/btnC             |                2 |              7 |         3.50 |
-|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[25].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[10].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[17].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[11].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[1].sel_add/i_out_reg[7]_0   |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[8].sel_add/i_out_reg[7]_0   |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[9].sel_add/i_out_reg[7]_0   |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[3].sel_add/i_out_reg[7]_0   |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[10].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[11].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[12].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[13].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[14].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[18].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[20].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[15].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[16].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[19].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[1].sel_add/i_out_reg[6]_1   |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[20].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[21].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[22].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[23].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[21].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[24].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[22].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[6].genblk1[4].sel_add/i_out_reg[7]_0   |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[26].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[27].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[28].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[29].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[2].sel_add/i_out_reg[7]_0   |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[30].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[10].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[5].sel_add/i_out_reg[7]_0   |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[6].genblk1[25].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[6].genblk1[26].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[6].genblk1[27].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[6].genblk1[28].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[3].sel_add/i_out_reg[7]_0   |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[6].genblk1[8].sel_add/i_out_reg[7]_0   |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[6].genblk1[29].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[6].genblk1[2].sel_add/i_out_reg[7]_0   |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[6].genblk1[30].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[4].sel_add/i_out_reg[7]_0   |                4 |              8 |         2.00 |
-|  clk_IBUF_BUFG |                 | genblk1[6].genblk1[3].sel_add/i_out_reg[7]_0   |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[6].genblk1[5].sel_add/i_out_reg[7]_0   |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[6].genblk1[6].sel_add/i_out_reg[7]_0   |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[6].genblk1[7].sel_add/i_out_reg[7]_0   |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[6].sel_add/i_out_reg[7]_0   |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[7].sel_add/i_out_reg[7]_0   |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[13].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[8].sel_add/i_out_reg[7]_0   |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[9].sel_add/i_out_reg[7]_0   |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[10].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[11].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[12].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[13].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[14].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[14].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[15].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[16].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[22].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[17].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[18].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[19].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[1].sel_add/i_out_reg[7]_0   |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[20].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[21].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[5].genblk1[15].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[5].genblk1[27].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[5].genblk1[16].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[5].genblk1[17].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[5].genblk1[18].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[5].genblk1[19].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[5].genblk1[1].sel_add/i_out_reg[7]_1   |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[5].genblk1[20].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[5].genblk1[21].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[5].genblk1[22].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[5].genblk1[23].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[28].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[5].genblk1[24].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[5].genblk1[25].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[5].genblk1[26].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[2].sel_add/i_out_reg[7]_0   |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[5].genblk1[29].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[5].genblk1[2].sel_add/i_out_reg[7]_0   |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[5].genblk1[30].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[12].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[29].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[5].genblk1[3].sel_add/i_out_reg[7]_0   |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[5].genblk1[4].sel_add/i_out_reg[7]_0   |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[6].genblk1[10].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[5].genblk1[5].sel_add/i_out_reg[7]_0   |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[5].genblk1[6].sel_add/i_out_reg[7]_0   |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[5].genblk1[7].sel_add/i_out_reg[7]_0   |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[5].genblk1[8].sel_add/i_out_reg[7]_0   |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[5].genblk1[9].sel_add/i_out_reg[7]_0   |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[6].genblk1[11].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[6].genblk1[12].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[6].genblk1[13].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[6].genblk1[14].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[30].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[6].genblk1[24].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[6].genblk1[15].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[6].genblk1[16].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[6].genblk1[17].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[6].genblk1[18].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[6].genblk1[19].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[6].genblk1[1].sel_add/i_out_reg[4]_2   |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[6].genblk1[20].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[6].genblk1[21].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[6].genblk1[22].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[6].genblk1[23].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[6].genblk1[9].sel_add/i_out_reg[7]_0   |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[4].sel_add/i_out_reg[7]_0   |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[5].sel_add/i_out_reg[7]_0   |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[6].sel_add/i_out_reg[7]_0   |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[7].sel_add/i_out_reg[7]_0   |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[8].sel_add/i_out_reg[7]_0   |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[9].sel_add/i_out_reg[7]_0   |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[23].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[4].genblk1[17].sel_add/i_out_reg[3]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[4].genblk1[10].sel_add/i_out_reg[3]_0  |                4 |              8 |         2.00 |
-|  clk_IBUF_BUFG |                 | genblk1[4].genblk1[11].sel_add/i_out_reg[3]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[4].genblk1[12].sel_add/i_out_reg[3]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[4].genblk1[13].sel_add/i_out_reg[3]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[4].genblk1[14].sel_add/i_out_reg[3]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[4].genblk1[15].sel_add/i_out_reg[3]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[4].genblk1[16].sel_add/i_out_reg[3]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[4].genblk1[18].sel_add/i_out_reg[3]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[4].genblk1[19].sel_add/i_out_reg[3]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[24].sel_add/i_out_reg[7]_0  |                4 |              8 |         2.00 |
-|  clk_IBUF_BUFG |                 | genblk1[4].genblk1[1].sel_add/i_out_reg[3]_0   |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[4].genblk1[20].sel_add/i_out_reg[3]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[4].genblk1[21].sel_add/i_out_reg[3]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[4].genblk1[22].sel_add/i_out_reg[3]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[4].genblk1[23].sel_add/i_out_reg[3]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[4].genblk1[24].sel_add/i_out_reg[3]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[4].genblk1[25].sel_add/i_out_reg[3]_0  |                4 |              8 |         2.00 |
-|  clk_IBUF_BUFG |                 | genblk1[4].genblk1[26].sel_add/i_out_reg[3]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[4].genblk1[30].sel_add/i_out_reg[3]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[4].genblk1[27].sel_add/i_out_reg[3]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[4].genblk1[28].sel_add/i_out_reg[3]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[25].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[4].genblk1[29].sel_add/i_out_reg[3]_0  |                4 |              8 |         2.00 |
-|  clk_IBUF_BUFG |                 | genblk1[4].genblk1[2].sel_add/i_out_reg[3]_0   |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[5].genblk1[14].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[4].genblk1[3].sel_add/i_out_reg[3]_0   |                4 |              8 |         2.00 |
-|  clk_IBUF_BUFG |                 | genblk1[4].genblk1[4].sel_add/i_out_reg[3]_0   |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[4].genblk1[5].sel_add/i_out_reg[3]_0   |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[4].genblk1[6].sel_add/i_out_reg[3]_0   |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[4].genblk1[7].sel_add/i_out_reg[3]_0   |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[26].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[4].genblk1[8].sel_add/i_out_reg[3]_0   |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[4].genblk1[9].sel_add/i_out_reg[3]_0   |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[27].sel_add/i_out_reg[7]_0  |                4 |              8 |         2.00 |
-|  clk_IBUF_BUFG |                 | genblk1[5].genblk1[10].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[5].genblk1[11].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[5].genblk1[28].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[5].genblk1[12].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[5].genblk1[13].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[23].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[15].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[24].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[25].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[26].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[27].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[28].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[17].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[29].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[2].sel_add/i_out_reg[7]_0   |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[30].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[16].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[3].sel_add/i_out_reg[7]_0   |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[4].sel_add/i_out_reg[7]_0   |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[5].sel_add/i_out_reg[7]_0   |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[6].sel_add/i_out_reg[7]_0   |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[7].sel_add/i_out_reg[7]_0   |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[8].sel_add/i_out_reg[7]_0   |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[9].sel_add/i_out_reg[7]_0   |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[11].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[12].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[13].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[14].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[15].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[16].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[17].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[18].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[19].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[18].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[1].sel_add/i_out_reg[7]_0   |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[26].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[20].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[21].sel_add/i_out_reg[7]_0  |                4 |              8 |         2.00 |
-|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[22].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[23].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[24].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[25].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[27].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[28].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[19].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[29].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[2].sel_add/i_out_reg[7]_0   |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[30].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[3].sel_add/i_out_reg[7]_0   |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[4].sel_add/i_out_reg[7]_0   |                3 |              8 |         2.67 |
-|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[5].sel_add/i_out_reg[7]_0   |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[6].sel_add/i_out_reg[7]_0   |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[7].sel_add/i_out_reg[7]_0   |                2 |              8 |         4.00 |
-|  clk_IBUF_BUFG | pb_db_btnR/E[0] |                                                |                4 |              8 |         2.00 |
-|  clk_IBUF_BUFG |                 | pb_db_btnR/PB_idle                             |                4 |             16 |         4.00 |
-|  clk_IBUF_BUFG |                 | pb_db_btnL/PB_idle                             |                4 |             16 |         4.00 |
-|  clk_IBUF_BUFG |                 |                                                |              148 |            286 |         1.93 |
-|  clk_IBUF_BUFG |                 | btnC_IBUF                                      |              366 |           1246 |         3.40 |
-+----------------+-----------------+------------------------------------------------+------------------+----------------+--------------+
++----------------+-----------------+-----------------------------------------------+------------------+----------------+--------------+
+|  Clock Signal  |  Enable Signal  |                Set/Reset Signal               | Slice Load Count | Bel Load Count | Bels / Slice |
++----------------+-----------------+-----------------------------------------------+------------------+----------------+--------------+
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[0].io_idelay/btnC          |                2 |              7 |         3.50 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[0].io_idelay/btnC          |                2 |              7 |         3.50 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[0].io_idelay/btnC          |                2 |              7 |         3.50 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[0].io_idelay/btnC          |                2 |              7 |         3.50 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[13].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[10].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[20].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[11].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[1].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[4].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[50].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[51].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[52].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[5].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[6].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[7].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[8].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[40].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[0].sel_add/i_out_reg[6]_0  |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[9].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[48].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[49].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[0].sel_add/i_out_reg[6]_0  |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[10].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[11].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[24].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[12].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[15].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[14].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[15].sel_add/i_out_reg[7]_0 |                4 |              8 |         2.00 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[21].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[16].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[17].sel_add/i_out_reg[7]_0 |                4 |              8 |         2.00 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[18].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[19].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[1].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[22].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[20].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[21].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[22].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[23].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[1].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[7].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[8].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[9].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[26].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[20].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[0].sel_add/i_out_reg[6]_1  |                4 |              8 |         2.00 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[10].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[11].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[12].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[13].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[27].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[14].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG | pb_db_btnR/E[0] |                                               |                4 |              8 |         2.00 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[16].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[17].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[18].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[28].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[19].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[21].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[22].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[12].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[29].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[23].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[24].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[25].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[26].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[27].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[35].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[2].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[28].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[29].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[2].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[30].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[31].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[45].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[30].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[32].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[33].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[34].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[36].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[31].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[37].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[4].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[38].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[39].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[3].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[40].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[32].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[41].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[42].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[43].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[44].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[45].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[33].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[34].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[46].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[47].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[48].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[49].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[3].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[25].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[26].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[27].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[28].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[29].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[2].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[30].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[31].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[32].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[33].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[23].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[34].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[35].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[36].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[37].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[38].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[39].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[5].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[41].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[42].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[24].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[43].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[44].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[45].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[6].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[46].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[47].sel_add/i_out_reg[7]_0 |                4 |              8 |         2.00 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[48].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[49].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[4].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[50].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[51].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[25].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[2].genblk1[52].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[43].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[50].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[51].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[52].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[35].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[5].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[6].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[7].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[8].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[3].genblk1[9].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[36].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[44].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[37].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[13].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[38].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[39].sel_add/i_out_reg[7]_0 |                4 |              8 |         2.00 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[3].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[40].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[41].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[42].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[46].sel_add/i_out_reg[7]_0 |                5 |              8 |         1.60 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[14].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[47].sel_add/i_out_reg[7]_0 |                4 |              8 |         2.00 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[48].sel_add/i_out_reg[7]_0 |                4 |              8 |         2.00 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[49].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[4].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[50].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[51].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[52].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[13].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[5].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[15].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[6].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[7].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[8].sel_add/i_out_reg[7]_0  |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[9].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[0].sel_add/i_out_reg[6]_0  |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[10].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[11].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[12].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[16].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[18].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[14].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[15].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[16].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[17].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[18].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[19].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[1].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[20].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[21].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[17].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[22].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[23].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[24].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[25].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[26].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[27].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[28].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[29].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[2].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[30].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[31].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[32].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[33].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[34].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[35].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[36].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[37].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[38].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[39].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[3].sel_add/i_out_reg[7]_0  |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[0].genblk1[19].sel_add/i_out_reg[7]_0 |                3 |              8 |         2.67 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[40].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[41].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[42].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[43].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[44].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[45].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[46].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | genblk1[1].genblk1[47].sel_add/i_out_reg[7]_0 |                2 |              8 |         4.00 |
+|  clk_IBUF_BUFG |                 | pb_db_btnL/PB_idle                            |                4 |             16 |         4.00 |
+|  clk_IBUF_BUFG |                 | pb_db_btnR/PB_idle                            |                4 |             16 |         4.00 |
+|  clk_IBUF_BUFG |                 |                                               |              136 |            247 |         1.82 |
+|  clk_IBUF_BUFG |                 | btnC_IBUF                                     |              333 |           1038 |         3.12 |
++----------------+-----------------+-----------------------------------------------+------------------+----------------+--------------+
 
 
