@@ -2,8 +2,8 @@
 # Webtalk v2020.2 (64-bit)
 # SW Build 3064766 on Wed Nov 18 09:12:45 MST 2020
 # IP Build 3064653 on Wed Nov 18 14:17:31 MST 2020
-# Start of session at: Thu Apr 22 00:49:24 2021
-# Process ID: 41392
+# Start of session at: Sun Apr 18 18:49:02 2021
+# Process ID: 14860
 # Current directory: E:/Documents/Vivado/Basys3/Projects/smvp_systolic/smvp_systolic.sim/sim_1/behav/xsim
 # Command line: wbtcv.exe -mode batch -source E:/Documents/Vivado/Basys3/Projects/smvp_systolic/smvp_systolic.sim/sim_1/behav/xsim/xsim.dir/smvp_systolic_top_behav/webtalk/xsim_webtalk.tcl -notrace
 # Log file: E:/Documents/Vivado/Basys3/Projects/smvp_systolic/smvp_systolic.sim/sim_1/behav/xsim/webtalk.log

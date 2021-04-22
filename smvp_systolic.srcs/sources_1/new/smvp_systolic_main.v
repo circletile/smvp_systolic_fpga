@@ -26,7 +26,7 @@ module smvp_systolic_top
     // Parameter Notes:
     // PE array of 16x4 was the optimal topology indicated in research paper "SYSTOLIC SPARSE MATRIX VECTOR MULTIPLY IN THE AGE OF TPUS AND ACCELERATORS"
     // Data bit length of 1 BECAUSE PATTERNS
-    #(parameter SYS_ARR_COLS=32,
+    #(parameter SYS_ARR_COLS=33,
       parameter SYS_ARR_ROWS=7,
       parameter DATA_BIT_LENGTH=1,
       parameter OUTPUT_BIT_LENGTH=8,
@@ -61,8 +61,8 @@ module smvp_systolic_top
     // Utility Registers
     reg enable; // Data LUT reazd loop enable (turns data read loop off when end of data reached)
     reg [15:0] counter; // Tracks number of array columns clocked in, used in data reading and end-of-data detection
-    reg [32:0] big_counter; // Tracks clock cycles, used to cycle LEDs to display accumulator index & value pairs
-    reg [4:0] scroll_index;
+    reg [32:0] big_counter; // Tracks clock cycles, used to cycle non-segment LEDs to display accumulator index & value pairs
+    reg [7:0] scroll_index;
     reg [7:0] scroll_value;
     wire stable_btnL, stable_btnR;
     
@@ -176,6 +176,8 @@ module smvp_systolic_top
         big_counter = 0;
         enable = 1;
         scroll_index = 0;
+        
+        // The following is ibm32 implemented as LUTs
         a_ij[0][0] = 1'b1;
         a_ij[0][1] = 1'b1;
         a_ij[0][2] = 1'b1;
@@ -637,7 +639,450 @@ module smvp_systolic_top
         i[6][29] = 1'b0;
         i[6][30] = 1'b0;
         i[6][31] = 1'b0;
-        i[6][32] = 1'b0;     
+        i[6][32] = 1'b0;    
+        
+//        // The following is curtis54 inplemented as LUTs
+//        a_ij[0][0] = 1'b1;
+//        a_ij[0][1] = 1'b1;
+//        a_ij[0][2] = 1'b1;
+//        a_ij[0][3] = 1'b1;
+//        a_ij[0][4] = 1'b1;
+//        a_ij[0][5] = 1'b1;
+//        a_ij[0][6] = 1'b1;
+//        a_ij[0][7] = 1'b1;
+//        a_ij[0][8] = 1'b1;
+//        a_ij[0][9] = 1'b1;
+//        a_ij[0][10] = 1'b1;
+//        a_ij[0][11] = 1'b1;
+//        a_ij[0][12] = 1'b1;
+//        a_ij[0][13] = 1'b1;
+//        a_ij[0][14] = 1'b1;
+//        a_ij[0][15] = 1'b1;
+//        a_ij[0][16] = 1'b1;
+//        a_ij[0][17] = 1'b1;
+//        a_ij[0][18] = 1'b1;
+//        a_ij[0][19] = 1'b1;
+//        a_ij[0][20] = 1'b1;
+//        a_ij[0][21] = 1'b1;
+//        a_ij[0][22] = 1'b1;
+//        a_ij[0][23] = 1'b1;
+//        a_ij[0][24] = 1'b1;
+//        a_ij[0][25] = 1'b1;
+//        a_ij[0][26] = 1'b1;
+//        a_ij[0][27] = 1'b1;
+//        a_ij[0][28] = 1'b1;
+//        a_ij[0][29] = 1'b1;
+//        a_ij[0][30] = 1'b1;
+//        a_ij[0][31] = 1'b1;
+//        a_ij[0][32] = 1'b1;
+//        a_ij[0][33] = 1'b1;
+//        a_ij[0][34] = 1'b1;
+//        a_ij[0][35] = 1'b1;
+//        a_ij[0][36] = 1'b1;
+//        a_ij[0][37] = 1'b1;
+//        a_ij[0][38] = 1'b1;
+//        a_ij[0][39] = 1'b1;
+//        a_ij[0][40] = 1'b1;
+//        a_ij[0][41] = 1'b1;
+//        a_ij[0][42] = 1'b1;
+//        a_ij[0][43] = 1'b1;
+//        a_ij[0][44] = 1'b1;
+//        a_ij[0][45] = 1'b1;
+//        a_ij[0][46] = 1'b1;
+//        a_ij[0][47] = 1'b1;
+//        a_ij[0][48] = 1'b1;
+//        a_ij[0][49] = 1'b1;
+//        a_ij[0][50] = 1'b1;
+//        a_ij[0][51] = 1'b1;
+//        a_ij[0][52] = 1'b1;
+//        a_ij[0][53] = 1'b1;
+//        a_ij[0][54] = 1'b0;
+//        a_ij[1][0] = 1'b0;
+//        a_ij[1][1] = 1'b1;
+//        a_ij[1][2] = 1'b1;
+//        a_ij[1][3] = 1'b1;
+//        a_ij[1][4] = 1'b1;
+//        a_ij[1][5] = 1'b1;
+//        a_ij[1][6] = 1'b1;
+//        a_ij[1][7] = 1'b1;
+//        a_ij[1][8] = 1'b1;
+//        a_ij[1][9] = 1'b1;
+//        a_ij[1][10] = 1'b1;
+//        a_ij[1][11] = 1'b1;
+//        a_ij[1][12] = 1'b1;
+//        a_ij[1][13] = 1'b1;
+//        a_ij[1][14] = 1'b1;
+//        a_ij[1][15] = 1'b1;
+//        a_ij[1][16] = 1'b1;
+//        a_ij[1][17] = 1'b1;
+//        a_ij[1][18] = 1'b1;
+//        a_ij[1][19] = 1'b1;
+//        a_ij[1][20] = 1'b1;
+//        a_ij[1][21] = 1'b1;
+//        a_ij[1][22] = 1'b1;
+//        a_ij[1][23] = 1'b1;
+//        a_ij[1][24] = 1'b1;
+//        a_ij[1][25] = 1'b1;
+//        a_ij[1][26] = 1'b1;
+//        a_ij[1][27] = 1'b1;
+//        a_ij[1][28] = 1'b1;
+//        a_ij[1][29] = 1'b1;
+//        a_ij[1][30] = 1'b1;
+//        a_ij[1][31] = 1'b1;
+//        a_ij[1][32] = 1'b1;
+//        a_ij[1][33] = 1'b1;
+//        a_ij[1][34] = 1'b1;
+//        a_ij[1][35] = 1'b1;
+//        a_ij[1][36] = 1'b1;
+//        a_ij[1][37] = 1'b1;
+//        a_ij[1][38] = 1'b1;
+//        a_ij[1][39] = 1'b1;
+//        a_ij[1][40] = 1'b1;
+//        a_ij[1][41] = 1'b1;
+//        a_ij[1][42] = 1'b1;
+//        a_ij[1][43] = 1'b1;
+//        a_ij[1][44] = 1'b1;
+//        a_ij[1][45] = 1'b1;
+//        a_ij[1][46] = 1'b1;
+//        a_ij[1][47] = 1'b1;
+//        a_ij[1][48] = 1'b1;
+//        a_ij[1][49] = 1'b1;
+//        a_ij[1][50] = 1'b1;
+//        a_ij[1][51] = 1'b1;
+//        a_ij[1][52] = 1'b1;
+//        a_ij[1][53] = 1'b1;
+//        a_ij[1][54] = 1'b1;
+//        a_ij[2][0] = 1'b0;
+//        a_ij[2][1] = 1'b0;
+//        a_ij[2][2] = 1'b1;
+//        a_ij[2][3] = 1'b1;
+//        a_ij[2][4] = 1'b1;
+//        a_ij[2][5] = 1'b1;
+//        a_ij[2][6] = 1'b1;
+//        a_ij[2][7] = 1'b1;
+//        a_ij[2][8] = 1'b1;
+//        a_ij[2][9] = 1'b1;
+//        a_ij[2][10] = 1'b1;
+//        a_ij[2][11] = 1'b1;
+//        a_ij[2][12] = 1'b1;
+//        a_ij[2][13] = 1'b1;
+//        a_ij[2][14] = 1'b1;
+//        a_ij[2][15] = 1'b1;
+//        a_ij[2][16] = 1'b1;
+//        a_ij[2][17] = 1'b1;
+//        a_ij[2][18] = 1'b1;
+//        a_ij[2][19] = 1'b1;
+//        a_ij[2][20] = 1'b1;
+//        a_ij[2][21] = 1'b1;
+//        a_ij[2][22] = 1'b1;
+//        a_ij[2][23] = 1'b1;
+//        a_ij[2][24] = 1'b1;
+//        a_ij[2][25] = 1'b1;
+//        a_ij[2][26] = 1'b1;
+//        a_ij[2][27] = 1'b1;
+//        a_ij[2][28] = 1'b1;
+//        a_ij[2][29] = 1'b1;
+//        a_ij[2][30] = 1'b1;
+//        a_ij[2][31] = 1'b1;
+//        a_ij[2][32] = 1'b1;
+//        a_ij[2][33] = 1'b1;
+//        a_ij[2][34] = 1'b1;
+//        a_ij[2][35] = 1'b1;
+//        a_ij[2][36] = 1'b1;
+//        a_ij[2][37] = 1'b1;
+//        a_ij[2][38] = 1'b1;
+//        a_ij[2][39] = 1'b1;
+//        a_ij[2][40] = 1'b1;
+//        a_ij[2][41] = 1'b1;
+//        a_ij[2][42] = 1'b1;
+//        a_ij[2][43] = 1'b1;
+//        a_ij[2][44] = 1'b1;
+//        a_ij[2][45] = 1'b1;
+//        a_ij[2][46] = 1'b1;
+//        a_ij[2][47] = 1'b1;
+//        a_ij[2][48] = 1'b1;
+//        a_ij[2][49] = 1'b1;
+//        a_ij[2][50] = 1'b1;
+//        a_ij[2][51] = 1'b1;
+//        a_ij[2][52] = 1'b1;
+//        a_ij[2][53] = 1'b1;
+//        a_ij[2][54] = 1'b1;
+//        a_ij[3][0] = 1'b0;
+//        a_ij[3][1] = 1'b0;
+//        a_ij[3][2] = 1'b0;
+//        a_ij[3][3] = 1'b1;
+//        a_ij[3][4] = 1'b1;
+//        a_ij[3][5] = 1'b1;
+//        a_ij[3][6] = 1'b1;
+//        a_ij[3][7] = 1'b1;
+//        a_ij[3][8] = 1'b1;
+//        a_ij[3][9] = 1'b1;
+//        a_ij[3][10] = 1'b1;
+//        a_ij[3][11] = 1'b1;
+//        a_ij[3][12] = 1'b1;
+//        a_ij[3][13] = 1'b1;
+//        a_ij[3][14] = 1'b1;
+//        a_ij[3][15] = 1'b1;
+//        a_ij[3][16] = 1'b1;
+//        a_ij[3][17] = 1'b1;
+//        a_ij[3][18] = 1'b1;
+//        a_ij[3][19] = 1'b1;
+//        a_ij[3][20] = 1'b1;
+//        a_ij[3][21] = 1'b1;
+//        a_ij[3][22] = 1'b1;
+//        a_ij[3][23] = 1'b1;
+//        a_ij[3][24] = 1'b1;
+//        a_ij[3][25] = 1'b1;
+//        a_ij[3][26] = 1'b1;
+//        a_ij[3][27] = 1'b1;
+//        a_ij[3][28] = 1'b1;
+//        a_ij[3][29] = 1'b1;
+//        a_ij[3][30] = 1'b1;
+//        a_ij[3][31] = 1'b1;
+//        a_ij[3][32] = 1'b1;
+//        a_ij[3][33] = 1'b1;
+//        a_ij[3][34] = 1'b1;
+//        a_ij[3][35] = 1'b1;
+//        a_ij[3][36] = 1'b1;
+//        a_ij[3][37] = 1'b1;
+//        a_ij[3][38] = 1'b1;
+//        a_ij[3][39] = 1'b1;
+//        a_ij[3][40] = 1'b1;
+//        a_ij[3][41] = 1'b1;
+//        a_ij[3][42] = 1'b1;
+//        a_ij[3][43] = 1'b1;
+//        a_ij[3][44] = 1'b1;
+//        a_ij[3][45] = 1'b1;
+//        a_ij[3][46] = 1'b0;
+//        a_ij[3][47] = 1'b0;
+//        a_ij[3][48] = 1'b0;
+//        a_ij[3][49] = 1'b0;
+//        a_ij[3][50] = 1'b0;
+//        a_ij[3][51] = 1'b0;
+//        a_ij[3][52] = 1'b0;
+//        a_ij[3][53] = 1'b0;
+//        a_ij[3][54] = 1'b0;
+//        i[0][0] = 2;
+//        i[0][1] = 18;
+//        i[0][2] = 2;
+//        i[0][3] = 27;
+//        i[0][4] = 31;
+//        i[0][5] = 0;
+//        i[0][6] = 3;
+//        i[0][7] = 15;
+//        i[0][8] = 17;
+//        i[0][9] = 17;
+//        i[0][10] = 17;
+//        i[0][11] = 20;
+//        i[0][12] = 3;
+//        i[0][13] = 17;
+//        i[0][14] = 20;
+//        i[0][15] = 20;
+//        i[0][16] = 26;
+//        i[0][17] = 3;
+//        i[0][18] = 3;
+//        i[0][19] = 35;
+//        i[0][20] = 2;
+//        i[0][21] = 4;
+//        i[0][22] = 5;
+//        i[0][23] = 10;
+//        i[0][24] = 14;
+//        i[0][25] = 15;
+//        i[0][26] = 20;
+//        i[0][27] = 26;
+//        i[0][28] = 36;
+//        i[0][29] = 40;
+//        i[0][30] = 3;
+//        i[0][31] = 6;
+//        i[0][32] = 42;
+//        i[0][33] = 28;
+//        i[0][34] = 48;
+//        i[0][35] = 32;
+//        i[0][36] = 28;
+//        i[0][37] = 8;
+//        i[0][38] = 8;
+//        i[0][39] = 20;
+//        i[0][40] = 27;
+//        i[0][41] = 35;
+//        i[0][42] = 38;
+//        i[0][43] = 0;
+//        i[0][44] = 0;
+//        i[0][45] = 5;
+//        i[0][46] = 2;
+//        i[0][47] = 12;
+//        i[0][48] = 14;
+//        i[0][49] = 31;
+//        i[0][50] = 35;
+//        i[0][51] = 3;
+//        i[0][52] = 48;
+//        i[0][53] = 50;
+//        i[0][54] = 1'b0;
+//        i[1][0] = 1'b0;
+//        i[1][1] = 3;
+//        i[1][2] = 19;
+//        i[1][3] = 3;
+//        i[1][4] = 29;
+//        i[1][5] = 35;
+//        i[1][6] = 1;
+//        i[1][7] = 6;
+//        i[1][8] = 17;
+//        i[1][9] = 18;
+//        i[1][10] = 19;
+//        i[1][11] = 19;
+//        i[1][12] = 26;
+//        i[1][13] = 6;
+//        i[1][14] = 19;
+//        i[1][15] = 26;
+//        i[1][16] = 26;
+//        i[1][17] = 27;
+//        i[1][18] = 6;
+//        i[1][19] = 6;
+//        i[1][20] = 38;
+//        i[1][21] = 3;
+//        i[1][22] = 5;
+//        i[1][23] = 7;
+//        i[1][24] = 11;
+//        i[1][25] = 15;
+//        i[1][26] = 17;
+//        i[1][27] = 21;
+//        i[1][28] = 30;
+//        i[1][29] = 37;
+//        i[1][30] = 41;
+//        i[1][31] = 6;
+//        i[1][32] = 42;
+//        i[1][33] = 45;
+//        i[1][34] = 48;
+//        i[1][35] = 49;
+//        i[1][36] = 50;
+//        i[1][37] = 32;
+//        i[1][38] = 10;
+//        i[1][39] = 10;
+//        i[1][40] = 21;
+//        i[1][41] = 29;
+//        i[1][42] = 36;
+//        i[1][43] = 40;
+//        i[1][44] = 1;
+//        i[1][45] = 1;
+//        i[1][46] = 7;
+//        i[1][47] = 6;
+//        i[1][48] = 13;
+//        i[1][49] = 15;
+//        i[1][50] = 36;
+//        i[1][51] = 40;
+//        i[1][52] = 44;
+//        i[1][53] = 49;
+//        i[1][54] = 51;
+//        i[2][0] = 1'b0;
+//        i[2][1] = 1'b0;
+//        i[2][2] = 4;
+//        i[2][3] = 20;
+//        i[2][4] = 4;
+//        i[2][5] = 30;
+//        i[2][6] = 36;
+//        i[2][7] = 2;
+//        i[2][8] = 12;
+//        i[2][9] = 18;
+//        i[2][10] = 19;
+//        i[2][11] = 21;
+//        i[2][12] = 20;
+//        i[2][13] = 27;
+//        i[2][14] = 33;
+//        i[2][15] = 20;
+//        i[2][16] = 27;
+//        i[2][17] = 27;
+//        i[2][18] = 29;
+//        i[2][19] = 31;
+//        i[2][20] = 31;
+//        i[2][21] = 40;
+//        i[2][22] = 4;
+//        i[2][23] = 6;
+//        i[2][24] = 8;
+//        i[2][25] = 12;
+//        i[2][26] = 16;
+//        i[2][27] = 18;
+//        i[2][28] = 22;
+//        i[2][29] = 32;
+//        i[2][30] = 38;
+//        i[2][31] = 42;
+//        i[2][32] = 44;
+//        i[2][33] = 44;
+//        i[2][34] = 46;
+//        i[2][35] = 49;
+//        i[2][36] = 50;
+//        i[2][37] = 51;
+//        i[2][38] = 49;
+//        i[2][39] = 11;
+//        i[2][40] = 11;
+//        i[2][41] = 22;
+//        i[2][42] = 30;
+//        i[2][43] = 37;
+//        i[2][44] = 41;
+//        i[2][45] = 2;
+//        i[2][46] = 2;
+//        i[2][47] = 8;
+//        i[2][48] = 9;
+//        i[2][49] = 14;
+//        i[2][50] = 16;
+//        i[2][51] = 39;
+//        i[2][52] = 43;
+//        i[2][53] = 47;
+//        i[2][54] = 50;
+//        i[3][0] = 1'b0;
+//        i[3][1] = 1'b0;
+//        i[3][2] = 1'b0;
+//        i[3][3] = 52;
+//        i[3][4] = 5;
+//        i[3][5] = 22;
+//        i[3][6] = 6;
+//        i[3][7] = 31;
+//        i[3][8] = 37;
+//        i[3][9] = 3;
+//        i[3][10] = 13;
+//        i[3][11] = 19;
+//        i[3][12] = 20;
+//        i[3][13] = 22;
+//        i[3][14] = 21;
+//        i[3][15] = 28;
+//        i[3][16] = 34;
+//        i[3][17] = 21;
+//        i[3][18] = 28;
+//        i[3][19] = 28;
+//        i[3][20] = 30;
+//        i[3][21] = 33;
+//        i[3][22] = 33;
+//        i[3][23] = 41;
+//        i[3][24] = 5;
+//        i[3][25] = 7;
+//        i[3][26] = 10;
+//        i[3][27] = 13;
+//        i[3][28] = 17;
+//        i[3][29] = 19;
+//        i[3][30] = 23;
+//        i[3][31] = 51;
+//        i[3][32] = 40;
+//        i[3][33] = 45;
+//        i[3][34] = 45;
+//        i[3][35] = 45;
+//        i[3][36] = 47;
+//        i[3][37] = 50;
+//        i[3][38] = 51;
+//        i[3][39] = 52;
+//        i[3][40] = 51;
+//        i[3][41] = 12;
+//        i[3][42] = 12;
+//        i[3][43] = 23;
+//        i[3][44] = 31;
+//        i[3][45] = 38;
+//        i[3][46] = 1'b0;
+//        i[3][47] = 1'b0;
+//        i[3][48] = 1'b0;
+//        i[3][49] = 1'b0;
+//        i[3][50] = 1'b0;
+//        i[3][51] = 1'b0;
+//        i[3][52] = 1'b0;
+//        i[3][53] = 1'b0;
+//        i[3][54] = 1'b0;
+         
     end
 
     PushButton_Debouncer pb_db_btnL (.clk(clk), .PB(btnL), .PB_down(stable_btnL) );
@@ -648,10 +1093,21 @@ module smvp_systolic_top
         big_counter <= big_counter + 1;
         if(counter > SYS_ARR_COLS - 1) enable = 0; // Stop reading data after longest TJDS data-row has been clocked in
                 
-        // Update segment LED with currently selected accumulator index
-        if (stable_btnL) scroll_index <= scroll_index - 1;
-        else if (stable_btnR) scroll_index <= scroll_index + 1;
-        scroll_value <= accum_result[scroll_index];
+        // Respond to L/R button presses and update segment LED with currently selected accumulator index
+        if (stable_btnL) begin
+            case (scroll_index)
+                0: scroll_index <= SYS_ARR_COLS - 1;
+                default: scroll_index <= scroll_index - 1;
+            endcase
+        end
+        else if (stable_btnR) begin
+            case (scroll_index)
+                (SYS_ARR_COLS-1): scroll_index <= 0;
+                default: scroll_index <= scroll_index + 1;
+            endcase
+        end
+        
+        scroll_value <= accum_result[scroll_index]; // this sets the segment LED value regardless of whether button press events occcurred
         
     end
     
@@ -794,29 +1250,29 @@ module basys3_numled_driver( input clk, input reset,
     end 
     
     assign port_sel = refresh_counter[19:18]; // anode activating signals for 4 LEDs, digit period of 2.6ms
-                                                            // decoder to generate anode signals 
+                                              // decoder to generate anode signals 
     always @(*) begin
         case(port_sel)
-        2'b00: begin
-            port = 4'b0111; // activate LED1 and Deactivate LED2, LED3, LED4
-            LED_BCD = accum_num / 10; // the tens digit of the 8-bit number
-            dp = 1;
-        end
-        2'b01: begin
-            port = 4'b1011; // activate LED2 and Deactivate LED1, LED3, LED4
-            LED_BCD = accum_num % 10; // the ones digit of the 8-bit number
-            dp = 0;
-        end
-        2'b10: begin
-            port = 4'b1101; // activate LED3 and Deactivate LED2, LED1, LED4
-            LED_BCD = accum_val / 10; // the tens digit of the 8-bit number
-            dp = 1;
-        end
-        2'b11: begin
-            port = 4'b1110; // activate LED4 and Deactivate LED2, LED3, LED1
-            LED_BCD = accum_val % 10; // the ones digit of the 8-bit number
-            dp = 1;    
-        end
+            2'b00: begin
+                port = 4'b0111; // activate LED1 and Deactivate LED2, LED3, LED4
+                LED_BCD = (accum_num / 16) % 16; // the tens digit of the 8-bit number in hexidecimal
+                dp = 1;
+            end
+            2'b01: begin
+                port = 4'b1011; // activate LED2 and Deactivate LED1, LED3, LED4
+                LED_BCD = accum_num % 16; // the ones digit of the 8-bit number in hexidecimal
+                dp = 0; // use decimal point as a visual separator between index and value
+            end
+            2'b10: begin
+                port = 4'b1101; // activate LED3 and Deactivate LED2, LED1, LED4
+                LED_BCD = (accum_val / 16) % 16; // the tens digit of the 8-bit number in hexidecimal
+                dp = 1;
+            end
+            2'b11: begin
+                port = 4'b1110; // activate LED4 and Deactivate LED2, LED3, LED1
+                LED_BCD = accum_val % 16; // the ones digit of the 8-bit number in hexidecimal
+                dp = 1;    
+            end
         endcase
     end
     
@@ -835,7 +1291,13 @@ module basys3_numled_driver( input clk, input reset,
             4'b0110: segments = 7'b0000010; // "6" 
             4'b0111: segments = 7'b1111000; // "7"
             4'b1000: segments = 7'b0000000; // "8"     
-            4'b1001: segments = 7'b0010000; // "9" 
+            4'b1001: segments = 7'b0010000; // "9"
+            4'b1010: segments = 7'b0001000; // "A"
+            4'b1011: segments = 7'b0000011; // "B" //as lowercase
+            4'b1100: segments = 7'b1000110; // "C"
+            4'b1101: segments = 7'b0100001; // "D" //as lowercase
+            4'b1110: segments = 7'b0000110; // "E"
+            4'b1111: segments = 7'b0001110; // "F" 
             default: segments = 7'b1000000; // "0"
         endcase
     end
