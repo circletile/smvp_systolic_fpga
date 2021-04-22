@@ -12,6 +12,8 @@ Compiling module xil_defaultlib.smvp_pe_mult
 Compiling module xil_defaultlib.smvp_io_idelay
 Compiling module xil_defaultlib.smvp_pe_seladd
 Compiling module xil_defaultlib.smvp_pe_accum
+Compiling module xil_defaultlib.basys3_numled_driver
+Compiling module xil_defaultlib.PushButton_Debouncer
 Compiling module xil_defaultlib.smvp_systolic_top
 Compiling module xil_defaultlib.glbl
 Built simulation snapshot smvp_systolic_top_behav
